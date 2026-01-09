@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>S & J 貓咪曆 - 豪華標記版</title>
+    <title>S & J 貓咪曆</title>
     <style>
         :root {
             --orange-cat: #ffb366;
@@ -12,161 +12,136 @@
             --heart-red: #ff4d4d;
             --bg: #fffbf5;
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; background: var(--bg); color: #444; }
-        button { touch-action: manipulation; } /* 優化手機點擊 */
-
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: #444; }
+        
         /* 登入畫面 */
-        #login-screen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+        #login-screen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; opacity: 1; transition: opacity 0.5s; }
 
-        /* 主介面 */
+        /* 主應用畫面 */
         #app { display: none; padding: 10px; max-width: 500px; margin: auto; padding-bottom: 50px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
-        .btn-nav { background: var(--orange-cat); border: none; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 16px;}
+        .btn-nav { background: var(--orange-cat); border: none; color: white; padding: 10px 18px; border-radius: 20px; font-weight: bold; font-size: 16px; cursor: pointer; }
 
         /* 月曆網格 */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: white; padding: 8px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .weekday { text-align: center; font-size: 11px; color: #999; padding-bottom: 5px; font-weight: bold; }
-        .day-cell { min-height: 75px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; transition: 0.2s; background: #fff; display: flex; flex-direction: column; }
-        .day-cell.today { border: 2px solid var(--orange-cat); background: #fffaf0; }
-        .day-num { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: white; padding: 10px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .weekday { text-align: center; font-size: 12px; color: #999; padding-bottom: 8px; font-weight: bold; }
+        .day-cell { min-height: 80px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; }
+        .day-cell.today { border: 2.5px solid var(--orange-cat); background: #fffaf0; }
+        .day-num { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
 
-        /* 月曆上的標記區域 */
-        .indicators-container { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; }
-        .ind-row { display: flex; gap: 3px; align-items: center; line-height: 1; }
-        
-        /* 星星樣式 (變大、變圓 - 使用 Emoji) */
-        .star-icon { font-size: 20px; } 
-        /* 使用濾鏡微調 Emoji 顏色以區分 S/J */
-        .star-s { filter: hue-rotate(-20deg) saturate(1.5); } /* 偏紅暖色 */
-        .star-j { filter: hue-rotate(100deg) saturate(1.2); } /* 偏綠冷色 */
-
-        /* Emoji 頭像樣式 */
-        .head-icon { font-size: 16px; }
-
-        /* 紅中空四方形樣式 */
-        .red-square-icon {
-            width: 12px; height: 12px;
-            border: 2px solid var(--s-color);
-            border-radius: 3px; /* 稍微圓角 */
-            display: inline-block; box-sizing: border-box;
-        }
-
-        /* 愛心樣式 */
-        .heart-grid { position: absolute; bottom: 3px; right: 3px; font-size: 12px; color: #eee; transition: 0.3s; }
-        .heart-grid.active { color: var(--heart-red); transform: scale(1.6); }
+        /* 月曆上的符號顯示 */
+        .indicators-container { display: flex; flex-direction: column; gap: 4px; flex-grow: 1; }
+        .ind-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+        .star-icon { font-size: 20px; line-height: 1; } /* 變大兩倍的星星 */
+        .star-s { filter: hue-rotate(-20deg) saturate(1.8); }
+        .star-j { filter: hue-rotate(100deg) saturate(1.4); }
+        .head-icon { font-size: 18px; line-height: 1; }
+        .red-square-icon { width: 14px; height: 14px; border: 2.5px solid var(--s-color); border-radius: 3px; display: inline-block; box-sizing: border-box; }
+        .heart-grid { position: absolute; bottom: 4px; right: 4px; font-size: 12px; color: #eee; transition: 0.3s; }
+        .heart-grid.active { color: var(--heart-red); transform: scale(1.8); }
 
         /* 下方編輯選單 */
-        #details-panel { margin-top: 15px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 -5px 30px rgba(0,0,0,0.08); border-top: 5px solid var(--orange-cat); }
-        .section-title { font-size: 15px; font-weight: bold; margin: 15px 0 8px; display: flex; align-items: center; justify-content: space-between;}
+        #details-panel { margin-top: 20px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 -5px 30px rgba(0,0,0,0.1); border-top: 6px solid var(--orange-cat); }
+        .section-title { font-size: 16px; font-weight: bold; margin: 20px 0 10px; display: flex; align-items: center; justify-content: space-between; }
         .s-title { color: var(--s-color); }
         .j-title { color: var(--j-color); }
         
-        /* 輸入框群組 */
-        .input-group { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 5px; border-radius: 10px;}
-        .time-input { border: 1px solid #eee; border-radius: 8px; padding: 8px; font-size: 15px; color: #444; background: #fff; }
-        .task-input { flex: 1; border: none; background: transparent; padding: 8px 5px; font-size: 16px; outline: none; }
+        /* 輸入與按鈕 */
+        .input-group { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; background: #f9f9f9; padding: 8px; border-radius: 12px; }
+        .time-input { border: 1px solid #ddd; border-radius: 8px; padding: 8px; font-size: 16px; }
+        .task-input { flex: 1; border: none; background: transparent; padding: 8px; font-size: 16px; outline: none; }
         
-        /* 按鈕樣式 */
-        .toggle-btn-group { display: flex; gap: 10px; margin-top: 5px; }
-        .icon-toggle-btn {
-            font-size: 24px; padding: 5px 15px; border-radius: 12px; border: 2px solid #eee; background: #fff; cursor: pointer; transition: 0.2s;
-        }
-        /* 按鈕被選中時的狀態 */
+        .icon-toggle-btn { font-size: 24px; padding: 8px 16px; border-radius: 15px; border: 2px solid #eee; background: #fff; cursor: pointer; }
         .icon-toggle-btn.active-s { border-color: var(--s-color); background: #fff0f0; }
         .icon-toggle-btn.active-j { border-color: var(--j-color); background: #f0fff0; }
-        .icon-toggle-btn.active-red { border-color: var(--s-color); }
+        .icon-toggle-btn.active-red { border-color: var(--s-color); background: #fff0f0; }
         
-        /* 紅框按鈕特別樣式 */
-        .square-btn-inner { width: 18px; height: 18px; border: 3px solid #ddd; border-radius: 4px; margin: auto; }
+        .square-btn-inner { width: 20px; height: 20px; border: 3px solid #ddd; border-radius: 4px; margin: auto; }
         .active-red .square-btn-inner { border-color: var(--s-color); }
 
-        /* 額外行程 & 新增按鈕 */
-        .extra-task-row { margin-bottom: 8px; }
-        .add-btn { width: 100%; padding: 10px; background: #f0f0f0; border: none; border-radius: 10px; color: #666; font-weight: bold; cursor: pointer; font-size: 14px;}
-
-        /* 大愛心開關 */
-        .heart-toggle-btn { background: #fff; border: 2px solid #eee; border-radius: 50%; width: 60px; height: 60px; font-size: 30px; display: block; margin: 25px auto 0; cursor: pointer; color: #eee; transition: 0.3s;}
+        .add-btn { width: 100%; padding: 12px; background: #f0f0f0; border: none; border-radius: 12px; color: #666; font-weight: bold; font-size: 15px; margin-top: 10px; cursor: pointer; }
+        .heart-toggle-btn { background: #fff; border: 2px solid #eee; border-radius: 50%; width: 70px; height: 70px; font-size: 35px; display: block; margin: 30px auto 10px; cursor: pointer; color: #eee; transition: 0.3s; }
         .heart-toggle-btn.active { color: var(--heart-red); border-color: var(--heart-red); background: #fff0f0; transform: scale(1.1); }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div style="font-size: 60px; margin-bottom: 20px;">😽</div>
-    <h2 style="color: var(--orange-cat); margin: 0 0 20px 0;">S & J 專屬曆</h2>
-    <input type="password" id="pwd" placeholder="輸入紀念日密碼" style="padding:12px; border-radius:12px; border:2px solid #eee; text-align:center; font-size: 18px; width: 200px; outline: none;">
-    <button onclick="checkLogin()" style="margin-top:25px; padding:12px 50px; background:var(--orange-cat); border:none; border-radius:30px; color:white; font-weight:bold; font-size: 18px; box-shadow: 0 4px 15px rgba(255, 179, 102, 0.4);">進入</button>
+    <div style="font-size: 70px; margin-bottom: 20px;">😽</div>
+    <h2 style="color: var(--orange-cat); margin-bottom: 25px;">S & J 專屬曆</h2>
+    <input type="password" id="pwd" placeholder="20190927" 
+           style="padding:15px; border-radius:15px; border:2px solid #ddd; text-align:center; font-size: 20px; width: 220px; outline: none;">
+    <button id="login-btn" onclick="checkLogin()" 
+            style="margin-top:30px; padding:15px 60px; background:var(--orange-cat); border:none; border-radius:35px; color:white; font-weight:bold; font-size: 20px; cursor: pointer;">進入</button>
 </div>
 
 <div id="app">
     <div class="header">
         <button class="btn-nav" onclick="changeMonth(-1)">◀</button>
-        <h2 id="current-month-display" style="margin: 0; font-size: 20px;"></h2>
+        <h2 id="current-month-display" style="margin: 0;">2026年 1月</h2>
         <button class="btn-nav" onclick="changeMonth(1)">▶</button>
     </div>
 
-    <div class="calendar-grid" id="calendar-grid">
-        </div>
+    <div class="calendar-grid" id="calendar-grid"></div>
 
     <div id="details-panel" style="display:none;">
-        <div style="text-align: center; font-weight: bold; color: #888; margin-bottom: 20px; font-size: 18px;" id="selected-date-label"></div>
+        <div style="text-align: center; font-weight: bold; color: #888; margin-bottom: 20px; font-size: 20px;" id="selected-date-label"></div>
         
         <div class="section-title s-title">
-            <span>S 的行程 (⭐)</span>
-             <button class="icon-toggle-btn" id="s-head-btn" onclick="toggleIcon(this, 'active-s')">🧑‍🦱</button>
+            <span>S 的行程 ⭐</span>
+            <button class="icon-toggle-btn" id="s-head-btn" onclick="toggleIcon(this, 'active-s')">🧑‍🦱</button>
         </div>
         <div class="input-group">
             <input type="time" id="s-time" class="time-input" onchange="updateData()">
-            <input type="text" id="s-task" class="task-input" placeholder="S 要做什麼？" onchange="updateData()">
+            <input type="text" id="s-task" class="task-input" placeholder="S 的記事..." onchange="updateData()">
         </div>
         
-        <div class="section-title j-title" style="margin-top: 25px;">
-            <span>J 的行程 (⭐)</span>
-             <button class="icon-toggle-btn" id="j-head-btn" onclick="toggleIcon(this, 'active-j')">👩‍🦰</button>
+        <div class="section-title j-title">
+            <span>J 的行程 ⭐</span>
+            <button class="icon-toggle-btn" id="j-head-btn" onclick="toggleIcon(this, 'active-j')">👩‍🦰</button>
         </div>
         <div class="input-group">
             <input type="time" id="j-time" class="time-input" onchange="updateData()">
-            <input type="text" id="j-task" class="task-input" placeholder="J 要去哪裡？" onchange="updateData()">
+            <input type="text" id="j-task" class="task-input" placeholder="J 的記事..." onchange="updateData()">
         </div>
 
-        <div class="section-title" style="color: #888; margin-top: 25px;">
-            <span>其他標記</span>
-            <button class="icon-toggle-btn" id="red-square-btn" onclick="toggleIcon(this, 'active-red')">
-                <div class="square-btn-inner"></div>
-            </button>
+        <div class="section-title" style="color:#888;">
+            <span>特別標記 ☐</span>
+            <button class="icon-toggle-btn" id="red-square-btn" onclick="toggleIcon(this, 'active-red')"><div class="square-btn-inner"></div></button>
         </div>
 
-        <div class="section-title" style="color: #888; margin-top: 25px;">📝 額外記事</div>
+        <div class="section-title" style="color:#888;">📝 更多行程</div>
         <div id="extra-tasks-container"></div>
-        <button class="add-btn" onclick="addExtraTask()">+ 新增一行</button>
+        <button class="add-btn" onclick="addExtraTask()">+ 新增行程</button>
 
         <button onclick="toggleHeartInDetail()" id="detail-heart-btn" class="heart-toggle-btn">❤</button>
-        </div>
+    </div>
 </div>
 
 <script>
     let currentViewDate = new Date();
     let selectedDateStr = "";
 
-    // 初始化資料結構 (如果需要同步功能，這裡的邏輯會改變)
-    function getInitialData() {
-        return {
-            sTask: "", sTime: "", jTask: "", jTime: "",
-            sHead: false, jHead: false, redSquare: false, heart: false,
-            extraTasks: [] // 儲存額外行程的陣列
-        };
-    }
-
+    // 1. 強大的登入邏輯
     function checkLogin() {
-        if(document.getElementById('pwd').value === '20190927') {
-            document.getElementById('login-screen').style.opacity = '0';
+        const input = document.getElementById('pwd').value.trim();
+        if (input === '20190927') {
+            const screen = document.getElementById('login-screen');
+            screen.style.opacity = '0';
             setTimeout(() => {
-                document.getElementById('login-screen').style.display = 'none';
+                screen.style.display = 'none';
                 document.getElementById('app').style.display = 'block';
                 renderCalendar();
-            }, 300);
-        } else { alert('密碼錯誤'); }
+            }, 500);
+        } else {
+            alert('密碼錯囉！請輸入 20190927');
+        }
     }
+
+    // 支援按下鍵盤 Enter 登入
+    document.getElementById('pwd').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') checkLogin();
+    });
 
     function renderCalendar() {
         const grid = document.getElementById('calendar-grid');
@@ -185,11 +160,11 @@
             const dateStr = `${year}-${month+1}-${d}`;
             const cell = document.createElement('div');
             cell.className = 'day-cell';
-            if(new Date().toDateString() === new Date(year, month, d).toDateString()) cell.classList.add('today');
+            const isToday = new Date().toDateString() === new Date(year, month, d).toDateString();
+            if(isToday) cell.classList.add('today');
             
-            const data = JSON.parse(localStorage.getItem(dateStr)) || getInitialData();
+            const data = JSON.parse(localStorage.getItem(dateStr)) || {sTask:"", sTime:"", jTask:"", jTime:"", sHead:false, jHead:false, redSquare:false, heart:false, extraTasks:[]};
             
-            // 準備標記 HTML
             const sStar = (data.sTask || data.sTime) ? '<span class="star-icon star-s">⭐</span>' : '';
             const jStar = (data.jTask || data.jTime) ? '<span class="star-icon star-j">⭐</span>' : '';
             const sHead = data.sHead ? '<span class="head-icon">🧑‍🦱</span>' : '';
@@ -210,4 +185,71 @@
     }
 
     function showDetails(dateStr) {
-        selectedDateStr
+        selectedDateStr = dateStr;
+        document.getElementById('details-panel').style.display = 'block';
+        document.getElementById('selected-date-label').innerText = "📅 " + dateStr;
+        
+        const data = JSON.parse(localStorage.getItem(dateStr)) || {sTask:"", sTime:"", jTask:"", jTime:"", sHead:false, jHead:false, redSquare:false, heart:false, extraTasks:[]};
+        
+        document.getElementById('s-task').value = data.sTask || "";
+        document.getElementById('s-time').value = data.sTime || "";
+        document.getElementById('j-task').value = data.jTask || "";
+        document.getElementById('j-time').value = data.jTime || "";
+        
+        document.getElementById('s-head-btn').className = 'icon-toggle-btn ' + (data.sHead ? 'active-s' : '');
+        document.getElementById('j-head-btn').className = 'icon-toggle-btn ' + (data.jHead ? 'active-j' : '');
+        document.getElementById('red-square-btn').className = 'icon-toggle-btn ' + (data.redSquare ? 'active-red' : '');
+        
+        if(data.heart) document.getElementById('detail-heart-btn').classList.add('active'); 
+        else document.getElementById('detail-heart-btn').classList.remove('active');
+        
+        const extraContainer = document.getElementById('extra-tasks-container');
+        extraContainer.innerHTML = "";
+        (data.extraTasks || []).forEach(val => createExtraInput(val));
+
+        setTimeout(() => document.getElementById('details-panel').scrollIntoView({behavior: "smooth"}), 200);
+    }
+
+    function toggleIcon(btn, activeClass) {
+        btn.classList.toggle(activeClass);
+        updateData();
+    }
+
+    function addExtraTask() { createExtraInput(""); }
+    function createExtraInput(val) {
+        const div = document.createElement('div');
+        div.className = 'input-group';
+        div.innerHTML = `<input type="text" class="task-input extra-in" placeholder="額外行程..." value="${val}" onchange="updateData()">`;
+        document.getElementById('extra-tasks-container').appendChild(div);
+    }
+
+    function updateData() {
+        if(!selectedDateStr) return;
+        const extraVals = Array.from(document.querySelectorAll('.extra-in')).map(i => i.value).filter(v => v.trim()!=="");
+        const data = {
+            sTask: document.getElementById('s-task').value,
+            sTime: document.getElementById('s-time').value,
+            jTask: document.getElementById('j-task').value,
+            jTime: document.getElementById('j-time').value,
+            sHead: document.getElementById('s-head-btn').classList.contains('active-s'),
+            jHead: document.getElementById('j-head-btn').classList.contains('active-j'),
+            redSquare: document.getElementById('red-square-btn').classList.contains('active-red'),
+            heart: document.getElementById('detail-heart-btn').classList.contains('active'),
+            extraTasks: extraVals
+        };
+        localStorage.setItem(selectedDateStr, JSON.stringify(data));
+        renderCalendar();
+    }
+
+    function toggleHeartInDetail() {
+        document.getElementById('detail-heart-btn').classList.toggle('active');
+        updateData();
+    }
+
+    function changeMonth(diff) {
+        currentViewDate.setMonth(currentViewDate.getMonth() + diff);
+        renderCalendar();
+    }
+</script>
+</body>
+</html>
