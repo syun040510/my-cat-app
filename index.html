@@ -21,17 +21,13 @@
         .weekday { text-align: center; font-size: 12px; color: #999; padding-bottom: 5px; font-weight: bold; }
         .day-cell { min-height: 85px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; }
         
-        /* 優先順位填色 */
+        /* 填色優先順位 */
         .hi-red { border: 2.5px solid var(--s-red) !important; background: #fff0f0 !important; }
-        .hi-rainbow { 
-            border: 2.5px solid transparent !important;
-            background: linear-gradient(white, white) padding-box, linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) border-box !important;
-        }
+        .hi-rainbow { border: 2.5px solid transparent !important; background: linear-gradient(white, white) padding-box, linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) border-box !important; }
         .hi-black { border: 2.5px solid #000 !important; background: #d3d3d3 !important; }
 
         .day-num { font-size: 14px; font-weight: bold; }
         .ind-row { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; line-height: 1; margin-top: 2px; }
-        /* 使用 ★ 確保顏色正確顯示 */
         .star-s { color: var(--s-red); font-size: 18px; }
         .star-j { color: var(--j-green); font-size: 18px; }
         .heart-mark { position: absolute; bottom: 4px; right: 4px; font-size: 14px; color: #ffb6c1; }
@@ -51,6 +47,12 @@
         .active-rainbow { border: 2.5px solid orange; color: #000; }
         .active-black { border-color: #000; background: #eee; color: #000; }
         .active-emoji { border-color: #333; color: #333; }
+
+        /* 留言板樣式 */
+        .memo-section { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #eee; }
+        .memo-title { font-size: 15px; font-weight: bold; color: #666; display: flex; align-items: center; gap: 5px; }
+        .memo-area { width: 100%; min-height: 100px; border: 1px solid #eee; border-radius: 12px; padding: 10px; margin-top: 8px; font-size: 15px; outline: none; box-sizing: border-box; resize: none; background: #fdfdfd; line-height: 1.5; color: #444; }
+        .memo-area:focus { border-color: var(--orange); background: #fff; }
     </style>
 </head>
 <body>
@@ -72,8 +74,10 @@
 
     <div id="details-panel" style="display:none;">
         <div id="date-label" style="text-align:center; font-weight:bold; color:#888; margin-bottom:15px;"></div>
+        
         <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span class="j-title">J</span><button onclick="addR('j')" style="font-size:11px;">+ 追加</button></div>
         <div id="j-tasks"></div>
+        
         <div style="display:flex; justify-content:space-between; margin:15px 0 5px;"><span class="s-title">S</span><button onclick="addR('s')" style="font-size:11px;">+ 追加</button></div>
         <div id="s-tasks"></div>
 
@@ -84,11 +88,15 @@
             <button class="icon-btn" id="black-btn" onclick="toggleBtn(this, 'active-black')">■</button>
             <button class="icon-btn" id="emoji-btn" onclick="toggleBtn(this, 'active-emoji')">😆</button>
         </div>
+
+        <div class="memo-section">
+            <div class="memo-title">📝 メッセージ / メモ</div>
+            <textarea id="memo-input" class="memo-area" placeholder="ここにメッセージを残せます..." onchange="save()"></textarea>
+        </div>
     </div>
 </div>
 
 <script>
-    // 您提供的 Firebase 配置
     const firebaseConfig = {
         apiKey: "AIzaSyA6AW2Lt_SuxNTeEBe6ZUAtSvkpVT96PAM",
         authDomain: "sjcalender-78d2a.firebaseapp.com",
@@ -110,9 +118,7 @@
     }
 
     function startSync() {
-        // 自動搬家：將此手機原本的 LocalStorage 推送到雲端
         migrateLocalToCloud();
-
         db.ref('calendar').on('value', (snap) => {
             cloudData = snap.val() || {};
             render();
@@ -132,10 +138,7 @@
                 }
             }
         }
-        if (count > 0) {
-            alert(count + "件の旧データを同期しました！");
-            localStorage.clear(); // 同步後清空手機本機空間
-        }
+        if (count > 0) { localStorage.clear(); }
     }
 
     function render() {
@@ -149,25 +152,11 @@
             const s = `${y}-${m+1}-${d}`;
             const cell = document.createElement('div'); cell.className = 'day-cell';
             const dAt = cloudData[s] || {j:[], s:[], red:false, rainbow:false, black:false, emoji:false, heart:false};
-            
-            // 填色優先順位：紅 > 彩虹 > 黑
-            if(dAt.red) cell.classList.add('hi-red'); 
-            else if(dAt.rainbow) cell.classList.add('hi-rainbow'); 
-            else if(dAt.black) cell.classList.add('hi-black');
-            
+            if(dAt.red) cell.classList.add('hi-red'); else if(dAt.rainbow) cell.classList.add('hi-rainbow'); else if(dAt.black) cell.classList.add('hi-black');
             if(new Date().toDateString() === new Date(y,m,d).toDateString()) cell.classList.add('today');
-            
             const jS = (dAt.j && dAt.j.length > 0) ? '<span class="star-j">★</span>' : '';
             const sS = (dAt.s && dAt.s.length > 0) ? '<span class="star-s">★</span>' : '';
-            
-            cell.innerHTML = `
-                <div class="day-num">${d}</div>
-                <div style="display:flex; flex-direction:column;">
-                    <div style="display:flex; gap:2px;">${jS}${sS}</div>
-                    ${dAt.emoji?'<span style="font-size:12px">😆</span>':''}
-                </div>
-                ${dAt.heart?'<span class="heart-mark">💞</span>':''}
-            `;
+            cell.innerHTML = `<div class="day-num">${d}</div><div class="ind-row">${jS}${sS}</div><div>${dAt.emoji?'<span style="font-size:12px">😆</span>':''}</div>${dAt.heart?'<span class="heart-mark">💞</span>':''}`;
             cell.onclick = () => show(s);
             grid.appendChild(cell);
         }
@@ -176,16 +165,20 @@
     function show(s) {
         selDate = s; document.getElementById('details-panel').style.display = 'block';
         document.getElementById('date-label').innerText = s;
-        const dAt = cloudData[s] || {j:[], s:[], red:false, rainbow:false, black:false, emoji:false, heart:false};
+        const dAt = cloudData[s] || {j:[], s:[], red:false, rainbow:false, black:false, emoji:false, heart:false, memo:""};
+        
         const rendT = (id, list) => {
             const c = document.getElementById(id); c.innerHTML = "";
             (list || []).forEach(t => addRow(id.split('-')[0], t.time, t.text));
             if(!list || list.length === 0) addRow(id.split('-')[0], "", "");
         };
         rendT('j-tasks', dAt.j); rendT('s-tasks', dAt.s);
+        
+        // 留言板內容載入
+        document.getElementById('memo-input').value = dAt.memo || "";
+
         const u = (id, a, c) => { const b = document.getElementById(id); if(a) b.classList.add(c); else b.classList.remove(c); };
         u('heart-btn', dAt.heart, 'active-heart'); u('red-btn', dAt.red, 'active-red'); u('rainbow-btn', dAt.rainbow, 'active-rainbow'); u('black-btn', dAt.black, 'active-black'); u('emoji-btn', dAt.emoji, 'active-emoji');
-        setTimeout(() => document.getElementById('details-panel').scrollIntoView({behavior: "smooth"}), 150);
     }
 
     function addRow(type, time="", text="") {
@@ -206,9 +199,10 @@
             red: document.getElementById('red-btn').classList.contains('active-red'),
             rainbow: document.getElementById('rainbow-btn').classList.contains('active-rainbow'),
             black: document.getElementById('black-btn').classList.contains('active-black'),
-            emoji: document.getElementById('emoji-btn').classList.contains('active-emoji')
+            emoji: document.getElementById('emoji-btn').classList.contains('active-emoji'),
+            memo: document.getElementById('memo-input').value // 留言儲存
         };
-        db.ref('calendar/' + selDate).set(dAt); // 同步到雲端
+        db.ref('calendar/' + selDate).set(dAt);
     }
     function changeMonth(n) { curMonth.setMonth(curMonth.getMonth() + n); render(); }
 </script>
