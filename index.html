@@ -1,248 +1,229 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>S & J 貓咪曆</title>
+    <title>エスアンドジェイカレンダー</title>
     <style>
         :root {
-            --orange-cat: #ffb366;
-            --s-color: #ff0000; /* 正紅 */
-            --j-color: #006400; /* 深綠 */
-            --heart-pink: #ffb6c1; 
+            --orange-main: #ffb366;
+            --s-color: #ff0000;
+            --j-color: #006400;
             --bg: #fffbf5;
         }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: #444; }
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; margin: 0; background: var(--bg); color: #444; -webkit-tap-highlight-color: transparent; }
         
-        /* 登入畫面 */
+        /* ログイン画面 */
         #login-screen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
+        .login-cat { font-size: 60px; margin-bottom: 10px; }
+        .login-title { color: var(--orange-main); font-size: 22px; font-weight: bold; margin-bottom: 25px; }
+        .login-input { padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align:center; font-size: 18px; width: 220px; outline: none; }
+        .login-btn { margin-top: 25px; padding: 15px 70px; background: var(--orange-main); border: none; border-radius: 35px; color: white; font-weight: bold; font-size: 18px; cursor: pointer; }
 
-        /* 主應用畫面 */
-        #app { display: none; padding: 10px; max-width: 500px; margin: auto; padding-bottom: 50px; }
+        /* メイン画面 */
+        #app { display: none; padding: 10px; max-width: 500px; margin: auto; padding-bottom: 40px; }
         .header { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
-        .btn-nav { background: var(--orange-cat); border: none; color: white; padding: 10px 18px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+        .btn-nav { background: var(--orange-main); border: none; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 16px; }
 
-        /* 月曆網格 */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: white; padding: 10px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .weekday { text-align: center; font-size: 12px; color: #999; padding-bottom: 8px; font-weight: bold; }
-        .day-cell { min-height: 85px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; }
-        .day-cell.today { border: 2px solid var(--orange-cat); }
-        
-        /* 紅色標記樣式 */
+        /* カレンダー本体 */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: white; padding: 8px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .weekday { text-align: center; font-size: 12px; color: #999; padding-bottom: 5px; font-weight: bold; }
+        .day-cell { min-height: 80px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; }
+        .day-cell.today { border: 2px solid var(--orange-main); }
         .day-cell.highlight-red { border: 2.5px solid var(--s-color) !important; background: #fff0f0 !important; }
+        .day-num { font-size: 14px; font-weight: bold; }
 
-        .day-num { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
+        /* アイコン表示 */
+        .indicators-container { display: flex; flex-direction: column; gap: 2px; flex-grow: 1; margin-top: 2px; }
+        .ind-row { display: flex; gap: 2px; align-items: center; flex-wrap: wrap; line-height: 1; }
+        .star-s { color: var(--s-color); font-size: 18px; filter: saturate(1.5); }
+        .star-j { color: var(--j-color); font-size: 18px; filter: saturate(1.5); }
+        .emoji-mark { font-size: 14px; }
+        .heart-mark { position: absolute; bottom: 4px; right: 4px; font-size: 14px; }
 
-        /* 月曆標記符號 */
-        .indicators-container { display: flex; flex-direction: column; gap: 4px; flex-grow: 1; }
-        .ind-row { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; line-height: 1; }
-        .star-icon { font-size: 20px; }
-        .star-s { filter: hue-rotate(-20deg) saturate(1.8); }
-        .star-j { filter: hue-rotate(100deg) saturate(1.4); }
-        .double-heart-calendar { font-size: 15px; display: flex; gap: 1px; }
-
-        .heart-grid { position: absolute; bottom: 4px; right: 4px; font-size: 14px; color: #eee; transition: 0.3s; }
-        .heart-grid.active { color: var(--heart-pink); transform: scale(1.4); }
-
-        /* 下方編輯選單 */
-        #details-panel { margin-top: 20px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 -5px 30px rgba(0,0,0,0.1); border-top: 6px solid var(--orange-cat); }
+        /* 編集パネル */
+        #details-panel { margin-top: 20px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--orange-main); }
+        .date-label { text-align: center; font-weight: bold; color: #888; margin-bottom: 20px; font-size: 18px; }
         .section-header { display: flex; justify-content: space-between; align-items: center; margin: 15px 0 8px; }
-        .section-title { font-size: 15px; font-weight: bold; }
-        .s-title { color: var(--s-color); }
+        .section-title { font-size: 16px; font-weight: bold; }
         .j-title { color: var(--j-color); }
-        
-        .task-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 6px; border-radius: 12px; }
-        .time-input { border: 1px solid #ddd; border-radius: 8px; padding: 6px; font-size: 14px; width: 85px; background: #fff; }
-        .task-input { flex: 1; border: none; background: transparent; padding: 8px; font-size: 16px; outline: none; }
+        .s-title { color: var(--s-color); }
+
+        .task-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 8px; border-radius: 12px; }
+        .time-input { border: 1px solid #ddd; border-radius: 8px; padding: 6px; font-size: 14px; width: 80px; background: #fff; }
+        .task-input { flex: 1; border: none; background: transparent; padding: 5px; font-size: 16px; outline: none; }
         .delete-btn { background: none; border: none; font-size: 18px; color: #ccc; cursor: pointer; }
+        .add-btn { background: #eee; border: none; border-radius: 10px; padding: 6px 15px; font-size: 12px; color: #666; font-weight: bold; }
 
-        .add-row-btn { background: #eee; border: none; border-radius: 10px; padding: 5px 12px; font-size: 12px; color: #666; font-weight: bold; }
-
-        /* 三個水平功能按鈕 */
-        .horizontal-toggle-group { display: flex; gap: 15px; margin: 25px 0; justify-content: center; border-top: 1px solid #f5f5f5; padding-top: 20px; }
-        .icon-toggle-btn { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #eee; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: 0.2s; color: #eee; }
+        /* ボタンメニュー */
+        .btn-menu { display: flex; gap: 15px; margin: 30px 0 10px; justify-content: center; }
+        .icon-btn { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #eee; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 26px; transition: 0.2s; color: #eee; }
+        .icon-btn.active-heart { color: #ff69b4; border-color: #ff69b4; background: #fff5f7; }
+        .icon-btn.active-red { border-color: var(--s-color); background: #fff0f0; }
+        .icon-btn.active-emoji { border-color: #333; background: #f9f9f9; color: #333; }
         
-        /* 按鈕激活狀態顏色 */
-        .icon-toggle-btn.active-heart { color: var(--heart-pink); border-color: var(--heart-pink); background: #fff5f7; }
-        .icon-toggle-btn.active-red { border-color: var(--s-color); background: #fff0f0; }
-        .icon-toggle-btn.active-double { border-color: #333; background: #f9f9f9; color: #333; }
-        
-        .square-inner { width: 22px; height: 22px; border: 3px solid #ddd; border-radius: 4px; }
-        .active-red .square-inner { border-color: var(--s-color); }
-        .circle-inner { font-size: 32px; font-weight: normal; }
+        .square-box { width: 22px; height: 22px; border: 3px solid #ddd; border-radius: 4px; }
+        .active-red .square-box { border-color: var(--s-color); }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div style="font-size: 60px; margin-bottom: 20px;">😽</div>
-    <h2 style="color: var(--orange-cat); margin-bottom: 25px;">S & J 專屬曆</h2>
-    <input type="password" id="pwd" placeholder="請輸入密碼" 
-           style="padding:15px; border-radius:15px; border:2px solid #ddd; text-align:center; font-size: 20px; width: 220px; outline: none;">
-    <button onclick="checkLogin()" style="margin-top:30px; padding:15px 60px; background:var(--orange-cat); border:none; border-radius:35px; color:white; font-weight:bold; font-size: 20px;">進入</button>
+    <div class="login-cat">😽</div>
+    <div class="login-title">エスアンドジェイカレンダー</div>
+    <input type="password" id="pwd" placeholder="パスワードを入力" class="login-input">
+    <button onclick="checkLogin()" class="login-btn">ログイン</button>
 </div>
 
 <div id="app">
     <div class="header">
         <button class="btn-nav" onclick="changeMonth(-1)">◀</button>
-        <h2 id="current-month-display" style="margin: 0;"></h2>
+        <h2 id="month-display" style="margin:0; font-size: 20px;"></h2>
         <button class="btn-nav" onclick="changeMonth(1)">▶</button>
     </div>
 
     <div class="calendar-grid" id="calendar-grid"></div>
 
     <div id="details-panel" style="display:none;">
-        <div style="text-align: center; font-weight: bold; color: #888; margin-bottom: 15px; font-size: 18px;" id="selected-date-label"></div>
+        <div class="date-label" id="date-label"></div>
         
         <div class="section-header">
-            <span class="section-title s-title">S 的行程 ⭐</span>
-            <button class="add-row-btn" onclick="addTaskRow('s')">+ 新增</button>
+            <span class="section-title j-title">J</span>
+            <button class="add-btn" onclick="addTask('j')">+ 追加</button>
         </div>
-        <div id="s-task-container"></div>
+        <div id="j-tasks"></div>
         
-        <div class="section-header">
-            <span class="section-title j-title">J 的行程 ⭐</span>
-            <button class="add-row-btn" onclick="addTaskRow('j')">+ 新增</button>
+        <div class="section-header" style="margin-top: 20px;">
+            <span class="section-title s-title">S</span>
+            <button class="add-btn" onclick="addTask('s')">+ 追加</button>
         </div>
-        <div id="j-task-container"></div>
+        <div id="s-tasks"></div>
 
-        <div class="horizontal-toggle-group">
-            <button class="icon-toggle-btn" id="main-heart-btn" onclick="toggleBtn(this, 'active-heart')">❤</button>
-            
-            <button class="icon-toggle-btn" id="red-square-btn" onclick="toggleBtn(this, 'active-red')">
-                <div class="square-inner"></div>
-            </button>
-            
-            <button class="icon-toggle-btn" id="double-heart-btn" onclick="toggleBtn(this, 'active-double')">
-                <span class="circle-inner">○</span>
-            </button>
+        <div class="btn-menu">
+            <button class="icon-btn" id="heart-btn" onclick="toggleBtn(this, 'active-heart')">💞</button>
+            <button class="icon-btn" id="red-btn" onclick="toggleBtn(this, 'active-red')"><div class="square-box"></div></button>
+            <button class="icon-btn" id="emoji-btn" onclick="toggleBtn(this, 'active-emoji')">😆</button>
         </div>
     </div>
 </div>
 
 <script>
     let currentViewDate = new Date();
-    let selectedDateStr = "";
+    let selectedDate = "";
 
     function checkLogin() {
-        if (document.getElementById('pwd').value.trim() === '20190927') {
+        if (document.getElementById('pwd').value === '20190927') {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             renderCalendar();
         } else {
-            alert('密碼錯誤');
+            alert('パスワードが違います');
             document.getElementById('pwd').value = '';
         }
     }
 
     function renderCalendar() {
         const grid = document.getElementById('calendar-grid');
-        grid.innerHTML = '<div class="weekday">日</div><div class="weekday">一</div><div class="weekday">二</div><div class="weekday">三</div><div class="weekday">四</div><div class="weekday">五</div><div class="weekday">六</div>';
+        grid.innerHTML = ['日','月','火','水','木','金','土'].map(d => `<div class="weekday">${d}</div>`).join('');
 
-        const year = currentViewDate.getFullYear();
-        const month = currentViewDate.getMonth();
-        document.getElementById('current-month-display').innerText = `${year}年 ${month + 1}月`;
+        const y = currentViewDate.getFullYear();
+        const m = currentViewDate.getMonth();
+        document.getElementById('month-display').innerText = `${y}年 ${m + 1}月`;
 
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const first = new Date(y, m, 1).getDay();
+        const days = new Date(y, m + 1, 0).getDate();
 
-        for(let i=0; i<firstDay; i++) grid.appendChild(document.createElement('div'));
+        for(let i=0; i<first; i++) grid.appendChild(document.createElement('div'));
 
-        for(let d=1; d<=daysInMonth; d++) {
-            const dateStr = `${year}-${month+1}-${d}`;
+        for(let d=1; d<=days; d++) {
+            const dStr = `${y}-${m+1}-${d}`;
             const cell = document.createElement('div');
             cell.className = 'day-cell';
-            const data = JSON.parse(localStorage.getItem(dateStr)) || {sTasks:[], jTasks:[], redSquare:false, doubleHeart:false, heart:false};
+            const data = JSON.parse(localStorage.getItem(dStr)) || {j:[], s:[], red:false, emoji:false, heart:false};
             
-            if(data.redSquare) cell.classList.add('highlight-red');
-            if(new Date().toDateString() === new Date(year, month, d).toDateString()) cell.classList.add('today');
+            if(data.red) cell.classList.add('highlight-red');
+            if(new Date().toDateString() === new Date(y,m,d).toDateString()) cell.classList.add('today');
             
-            const sStar = (data.sTasks && data.sTasks.length > 0) ? '<span class="star-icon star-s">⭐</span>' : '';
-            const jStar = (data.jTasks && data.jTasks.length > 0) ? '<span class="star-icon star-j">⭐</span>' : '';
-            // 修改雙愛心顏色：正紅與深綠
-            const dHeart = data.doubleHeart ? '<div class="double-heart-calendar"><span style="color:#ff0000">❤</span><span style="color:#006400">❤</span></div>' : '';
+            const jStar = (data.j && data.j.length > 0) ? '<span class="star-j">⭐</span>' : '';
+            const sStar = (data.s && data.s.length > 0) ? '<span class="star-s">⭐</span>' : '';
+            const emoji = data.emoji ? '<span class="emoji-mark">😆</span>' : '';
+            const heart = data.heart ? '<span class="heart-mark">💞</span>' : '';
 
             cell.innerHTML = `
                 <div class="day-num">${d}</div>
                 <div class="indicators-container">
-                    <div class="ind-row">${sStar}${jStar}</div>
-                    <div class="ind-row">${dHeart}</div>
+                    <div class="ind-row">${jStar}${sStar}</div>
+                    <div class="ind-row">${emoji}</div>
                 </div>
-                <div class="heart-grid ${data.heart ? 'active' : ''}">❤</div>
+                ${heart}
             `;
-            cell.onclick = () => showDetails(dateStr);
+            cell.onclick = () => showDetails(dStr);
             grid.appendChild(cell);
         }
     }
 
-    function showDetails(dateStr) {
-        selectedDateStr = dateStr;
+    function showDetails(dStr) {
+        selectedDate = dStr;
         document.getElementById('details-panel').style.display = 'block';
-        document.getElementById('selected-date-label').innerText = "📅 " + dateStr;
-        const data = JSON.parse(localStorage.getItem(dateStr)) || {sTasks:[], jTasks:[], redSquare:false, doubleHeart:false, heart:false};
+        document.getElementById('date-label').innerText = "📅 " + dStr;
+        const data = JSON.parse(localStorage.getItem(dStr)) || {j:[], s:[], red:false, emoji:false, heart:false};
         
-        renderTaskInputs('s-task-container', data.sTasks || []);
-        renderTaskInputs('j-task-container', data.jTasks || []);
+        renderTaskGroup('j-tasks', data.j || []);
+        renderTaskGroup('s-tasks', data.s || []);
         
-        // 更新按鈕樣式
-        updateBtnUI('main-heart-btn', data.heart, 'active-heart');
-        updateBtnUI('red-square-btn', data.redSquare, 'active-red');
-        updateBtnUI('double-heart-btn', data.doubleHeart, 'active-double');
+        updateBtn('heart-btn', data.heart, 'active-heart');
+        updateBtn('red-btn', data.red, 'active-red');
+        updateBtn('emoji-btn', data.emoji, 'active-emoji');
         
-        setTimeout(() => document.getElementById('details-panel').scrollIntoView({behavior:"smooth"}), 150);
+        setTimeout(() => document.getElementById('details-panel').scrollIntoView({behavior:"smooth"}), 100);
     }
 
-    function updateBtnUI(id, active, cls) {
-        const btn = document.getElementById(id);
-        if(active) btn.classList.add(cls); else btn.classList.remove(cls);
-    }
-
-    function toggleBtn(btn, cls) {
-        btn.classList.toggle(cls);
-        updateData();
-    }
-
-    function renderTaskInputs(containerId, tasks) {
-        const container = document.getElementById(containerId);
+    function renderTaskGroup(id, tasks) {
+        const container = document.getElementById(id);
         container.innerHTML = "";
-        tasks.forEach(task => addTaskRow(containerId.split('-')[0], task.time, task.text));
-        if(tasks.length === 0) addTaskRow(containerId.split('-')[0], "", "");
+        tasks.forEach(t => addTaskRow(id.split('-')[0], t.time, t.text));
+        if(tasks.length === 0) addTaskRow(id.split('-')[0], "", "");
     }
 
-    function addTaskRow(type, time = "", text = "") {
-        const container = document.getElementById(type + '-task-container');
+    function addTaskRow(type, time="", text="") {
         const div = document.createElement('div');
         div.className = 'task-row';
         div.innerHTML = `
-            <input type="time" class="time-input t-time" value="${time}" onchange="updateData()">
-            <input type="text" class="task-input t-text" placeholder="記事..." value="${text}" onchange="updateData()">
-            <button class="delete-btn" onclick="this.parentElement.remove(); updateData();">🗑️</button>
+            <input type="time" class="time-input t-time" value="${time}" onchange="save()">
+            <input type="text" class="task-input t-text" placeholder="予定を入力..." value="${text}" onchange="save()">
+            <button class="delete-btn" onclick="this.parentElement.remove(); save();">🗑️</button>
         `;
-        container.appendChild(div);
+        document.getElementById(type + '-tasks').appendChild(div);
     }
 
-    function updateData() {
-        if(!selectedDateStr) return;
-        const getTasks = (id) => Array.from(document.getElementById(id).querySelectorAll('.task-row')).map(row => ({
-            time: row.querySelector('.t-time').value,
-            text: row.querySelector('.t-text').value
+    function addTask(type) { addTaskRow(type, "", ""); save(); }
+
+    function updateBtn(id, active, cls) {
+        const b = document.getElementById(id);
+        if(active) b.classList.add(cls); else b.classList.remove(cls);
+    }
+
+    function toggleBtn(b, cls) { b.classList.toggle(cls); save(); }
+
+    function save() {
+        if(!selectedDate) return;
+        const getT = (id) => Array.from(document.getElementById(id).querySelectorAll('.task-row')).map(r => ({
+            time: r.querySelector('.t-time').value,
+            text: r.querySelector('.t-text').value
         })).filter(t => t.time || t.text);
 
         const data = {
-            sTasks: getTasks('s-task-container'),
-            jTasks: getTasks('j-task-container'),
-            heart: document.getElementById('main-heart-btn').classList.contains('active-heart'),
-            redSquare: document.getElementById('red-square-btn').classList.contains('active-red'),
-            doubleHeart: document.getElementById('double-heart-btn').classList.contains('active-double')
+            j: getT('j-tasks'),
+            s: getT('s-tasks'),
+            heart: document.getElementById('heart-btn').classList.contains('active-heart'),
+            red: document.getElementById('red-btn').classList.contains('active-red'),
+            emoji: document.getElementById('emoji-btn').classList.contains('active-emoji')
         };
-        localStorage.setItem(selectedDateStr, JSON.stringify(data));
+        localStorage.setItem(selectedDate, JSON.stringify(data));
         renderCalendar();
     }
 
-    function changeMonth(diff) {
-        currentViewDate.setMonth(currentViewDate.getMonth() + diff);
-        renderCalendar();
-    }
+    function changeMonth(n) { currentViewDate.setMonth(currentViewDate.getMonth() + n); renderCalendar(); }
 </script>
 </body>
 </html>
