@@ -7,15 +7,15 @@
     <style>
         :root {
             --orange-cat: #ffb366;
-            --s-color: #ff4d4d;
-            --j-color: #2d5a27;
-            --heart-pink: #ffb6c1; /* 右下角愛心改粉紅 */
+            --s-color: #ff0000; /* 正紅 */
+            --j-color: #006400; /* 深綠 */
+            --heart-pink: #ffb6c1; 
             --bg: #fffbf5;
         }
         body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: #444; }
         
         /* 登入畫面 */
-        #login-screen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; transition: opacity 0.5s; }
+        #login-screen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
 
         /* 主應用畫面 */
         #app { display: none; padding: 10px; max-width: 500px; margin: auto; padding-bottom: 50px; }
@@ -26,9 +26,9 @@
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: white; padding: 10px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .weekday { text-align: center; font-size: 12px; color: #999; padding-bottom: 8px; font-weight: bold; }
         .day-cell { min-height: 85px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; }
-        .day-cell.today { border: 2.5px solid var(--orange-cat); }
+        .day-cell.today { border: 2px solid var(--orange-cat); }
         
-        /* 紅色標記樣式：紅框＋淡紅背景 */
+        /* 紅色標記樣式 */
         .day-cell.highlight-red { border: 2.5px solid var(--s-color) !important; background: #fff0f0 !important; }
 
         .day-num { font-size: 14px; font-weight: bold; margin-bottom: 2px; }
@@ -39,37 +39,37 @@
         .star-icon { font-size: 20px; }
         .star-s { filter: hue-rotate(-20deg) saturate(1.8); }
         .star-j { filter: hue-rotate(100deg) saturate(1.4); }
-        .double-heart-icon { font-size: 16px; letter-spacing: -2px; } /* 雙愛心顯示 */
+        .double-heart-calendar { font-size: 15px; display: flex; gap: 1px; }
 
         .heart-grid { position: absolute; bottom: 4px; right: 4px; font-size: 14px; color: #eee; transition: 0.3s; }
         .heart-grid.active { color: var(--heart-pink); transform: scale(1.4); }
 
         /* 下方編輯選單 */
         #details-panel { margin-top: 20px; background: white; border-radius: 25px; padding: 20px; box-shadow: 0 -5px 30px rgba(0,0,0,0.1); border-top: 6px solid var(--orange-cat); }
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin: 20px 0 10px; }
-        .section-title { font-size: 16px; font-weight: bold; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin: 15px 0 8px; }
+        .section-title { font-size: 15px; font-weight: bold; }
         .s-title { color: var(--s-color); }
         .j-title { color: var(--j-color); }
         
-        /* 輸入與刪除按鈕 */
         .task-row { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; background: #f9f9f9; padding: 6px; border-radius: 12px; }
         .time-input { border: 1px solid #ddd; border-radius: 8px; padding: 6px; font-size: 14px; width: 85px; background: #fff; }
         .task-input { flex: 1; border: none; background: transparent; padding: 8px; font-size: 16px; outline: none; }
-        .delete-btn { background: none; border: none; font-size: 18px; color: #ccc; cursor: pointer; padding: 0 5px; }
+        .delete-btn { background: none; border: none; font-size: 18px; color: #ccc; cursor: pointer; }
 
-        .add-row-btn { background: #eee; border: none; border-radius: 10px; padding: 5px 12px; font-size: 13px; color: #666; font-weight: bold; cursor: pointer; }
+        .add-row-btn { background: #eee; border: none; border-radius: 10px; padding: 5px 12px; font-size: 12px; color: #666; font-weight: bold; }
 
-        /* 功能按鈕 */
-        .toggle-group { display: flex; gap: 15px; margin: 20px 0; justify-content: center; }
-        .icon-toggle-btn { font-size: 24px; width: 60px; height: 50px; border-radius: 15px; border: 2px solid #eee; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .icon-toggle-btn.active-red { border-color: var(--s-color); background: #fff0f0; }
-        .icon-toggle-btn.active-double { border-color: var(--orange-cat); background: #fff9f0; }
+        /* 三個水平功能按鈕 */
+        .horizontal-toggle-group { display: flex; gap: 15px; margin: 25px 0; justify-content: center; border-top: 1px solid #f5f5f5; padding-top: 20px; }
+        .icon-toggle-btn { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #eee; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 28px; transition: 0.2s; color: #eee; }
         
-        .square-btn-inner { width: 18px; height: 18px; border: 3px solid #ddd; border-radius: 3px; }
-        .active-red .square-btn-inner { border-color: var(--s-color); }
-
-        .heart-main-btn { background: #fff; border: 2px solid #eee; border-radius: 50%; width: 70px; height: 70px; font-size: 35px; display: block; margin: 30px auto 10px; cursor: pointer; color: #eee; transition: 0.3s; }
-        .heart-main-btn.active { color: var(--heart-pink); border-color: var(--heart-pink); background: #fff5f7; transform: scale(1.1); }
+        /* 按鈕激活狀態顏色 */
+        .icon-toggle-btn.active-heart { color: var(--heart-pink); border-color: var(--heart-pink); background: #fff5f7; }
+        .icon-toggle-btn.active-red { border-color: var(--s-color); background: #fff0f0; }
+        .icon-toggle-btn.active-double { border-color: #333; background: #f9f9f9; color: #333; }
+        
+        .square-inner { width: 22px; height: 22px; border: 3px solid #ddd; border-radius: 4px; }
+        .active-red .square-inner { border-color: var(--s-color); }
+        .circle-inner { font-size: 32px; font-weight: normal; }
     </style>
 </head>
 <body>
@@ -92,30 +92,31 @@
     <div class="calendar-grid" id="calendar-grid"></div>
 
     <div id="details-panel" style="display:none;">
-        <div style="text-align: center; font-weight: bold; color: #888; margin-bottom: 20px; font-size: 18px;" id="selected-date-label"></div>
+        <div style="text-align: center; font-weight: bold; color: #888; margin-bottom: 15px; font-size: 18px;" id="selected-date-label"></div>
         
         <div class="section-header">
             <span class="section-title s-title">S 的行程 ⭐</span>
-            <button class="add-row-btn" onclick="addTaskRow('s')">+ 新增行程</button>
+            <button class="add-row-btn" onclick="addTaskRow('s')">+ 新增</button>
         </div>
         <div id="s-task-container"></div>
         
         <div class="section-header">
             <span class="section-title j-title">J 的行程 ⭐</span>
-            <button class="add-row-btn" onclick="addTaskRow('j')">+ 新增行程</button>
+            <button class="add-row-btn" onclick="addTaskRow('j')">+ 新增</button>
         </div>
         <div id="j-task-container"></div>
 
-        <div class="toggle-group">
-            <button class="icon-toggle-btn" id="red-square-btn" onclick="toggleIcon(this, 'active-red')">
-                <div class="square-btn-inner"></div>
+        <div class="horizontal-toggle-group">
+            <button class="icon-toggle-btn" id="main-heart-btn" onclick="toggleBtn(this, 'active-heart')">❤</button>
+            
+            <button class="icon-toggle-btn" id="red-square-btn" onclick="toggleBtn(this, 'active-red')">
+                <div class="square-inner"></div>
             </button>
-            <button class="icon-toggle-btn" id="double-heart-btn" onclick="toggleIcon(this, 'active-double')">
-                ❤️💚
+            
+            <button class="icon-toggle-btn" id="double-heart-btn" onclick="toggleBtn(this, 'active-double')">
+                <span class="circle-inner">○</span>
             </button>
         </div>
-
-        <button onclick="toggleHeartInDetail()" id="detail-heart-btn" class="heart-main-btn">❤</button>
     </div>
 </div>
 
@@ -124,13 +125,12 @@
     let selectedDateStr = "";
 
     function checkLogin() {
-        const input = document.getElementById('pwd').value.trim();
-        if (input === '20190927') {
+        if (document.getElementById('pwd').value.trim() === '20190927') {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             renderCalendar();
         } else {
-            alert('密碼錯誤'); // 僅提示密碼錯誤
+            alert('密碼錯誤');
             document.getElementById('pwd').value = '';
         }
     }
@@ -152,7 +152,6 @@
             const dateStr = `${year}-${month+1}-${d}`;
             const cell = document.createElement('div');
             cell.className = 'day-cell';
-            
             const data = JSON.parse(localStorage.getItem(dateStr)) || {sTasks:[], jTasks:[], redSquare:false, doubleHeart:false, heart:false};
             
             if(data.redSquare) cell.classList.add('highlight-red');
@@ -160,7 +159,8 @@
             
             const sStar = (data.sTasks && data.sTasks.length > 0) ? '<span class="star-icon star-s">⭐</span>' : '';
             const jStar = (data.jTasks && data.jTasks.length > 0) ? '<span class="star-icon star-j">⭐</span>' : '';
-            const dHeart = data.doubleHeart ? '<span class="double-heart-icon">❤️💚</span>' : '';
+            // 修改雙愛心顏色：正紅與深綠
+            const dHeart = data.doubleHeart ? '<div class="double-heart-calendar"><span style="color:#ff0000">❤</span><span style="color:#006400">❤</span></div>' : '';
 
             cell.innerHTML = `
                 <div class="day-num">${d}</div>
@@ -179,28 +179,34 @@
         selectedDateStr = dateStr;
         document.getElementById('details-panel').style.display = 'block';
         document.getElementById('selected-date-label').innerText = "📅 " + dateStr;
-        
         const data = JSON.parse(localStorage.getItem(dateStr)) || {sTasks:[], jTasks:[], redSquare:false, doubleHeart:false, heart:false};
         
-        // 渲染行程列
         renderTaskInputs('s-task-container', data.sTasks || []);
         renderTaskInputs('j-task-container', data.jTasks || []);
         
-        // 按鈕狀態
-        document.getElementById('red-square-btn').className = 'icon-toggle-btn ' + (data.redSquare ? 'active-red' : '');
-        document.getElementById('double-heart-btn').className = 'icon-toggle-btn ' + (data.doubleHeart ? 'active-double' : '');
+        // 更新按鈕樣式
+        updateBtnUI('main-heart-btn', data.heart, 'active-heart');
+        updateBtnUI('red-square-btn', data.redSquare, 'active-red');
+        updateBtnUI('double-heart-btn', data.doubleHeart, 'active-double');
         
-        if(data.heart) document.getElementById('detail-heart-btn').classList.add('active'); 
-        else document.getElementById('detail-heart-btn').classList.remove('active');
-        
-        setTimeout(() => document.getElementById('details-panel').scrollIntoView({behavior: "smooth"}), 150);
+        setTimeout(() => document.getElementById('details-panel').scrollIntoView({behavior:"smooth"}), 150);
+    }
+
+    function updateBtnUI(id, active, cls) {
+        const btn = document.getElementById(id);
+        if(active) btn.classList.add(cls); else btn.classList.remove(cls);
+    }
+
+    function toggleBtn(btn, cls) {
+        btn.classList.toggle(cls);
+        updateData();
     }
 
     function renderTaskInputs(containerId, tasks) {
         const container = document.getElementById(containerId);
         container.innerHTML = "";
-        tasks.forEach(task => addTaskRow(containerId === 's-task-container' ? 's' : 'j', task.time, task.text));
-        if(tasks.length === 0) addTaskRow(containerId === 's-task-container' ? 's' : 'j', "", ""); // 預設一行
+        tasks.forEach(task => addTaskRow(containerId.split('-')[0], task.time, task.text));
+        if(tasks.length === 0) addTaskRow(containerId.split('-')[0], "", "");
     }
 
     function addTaskRow(type, time = "", text = "") {
@@ -215,36 +221,22 @@
         container.appendChild(div);
     }
 
-    function toggleIcon(btn, activeClass) {
-        btn.classList.toggle(activeClass);
-        updateData();
-    }
-
     function updateData() {
         if(!selectedDateStr) return;
-        
-        const getTasks = (containerId) => {
-            const rows = document.getElementById(containerId).querySelectorAll('.task-row');
-            return Array.from(rows).map(row => ({
-                time: row.querySelector('.t-time').value,
-                text: row.querySelector('.t-text').value
-            })).filter(t => t.time || t.text);
-        };
+        const getTasks = (id) => Array.from(document.getElementById(id).querySelectorAll('.task-row')).map(row => ({
+            time: row.querySelector('.t-time').value,
+            text: row.querySelector('.t-text').value
+        })).filter(t => t.time || t.text);
 
         const data = {
             sTasks: getTasks('s-task-container'),
             jTasks: getTasks('j-task-container'),
+            heart: document.getElementById('main-heart-btn').classList.contains('active-heart'),
             redSquare: document.getElementById('red-square-btn').classList.contains('active-red'),
-            doubleHeart: document.getElementById('double-heart-btn').classList.contains('active-double'),
-            heart: document.getElementById('detail-heart-btn').classList.contains('active')
+            doubleHeart: document.getElementById('double-heart-btn').classList.contains('active-double')
         };
         localStorage.setItem(selectedDateStr, JSON.stringify(data));
         renderCalendar();
-    }
-
-    function toggleHeartInDetail() {
-        document.getElementById('detail-heart-btn').classList.toggle('active');
-        updateData();
     }
 
     function changeMonth(diff) {
