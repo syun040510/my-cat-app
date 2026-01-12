@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JHSL 售票系統 - 會員中心</title>
+    <title>JHSL チケットシステム - 会員ログイン</title>
     <link rel="icon" href="https://img.icons8.com/color/48/000000/ticket.png" type="image/x-icon">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
@@ -16,9 +16,9 @@
             --j-green: #006400; 
             --select-highlight: #e0f0ff;
         }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: #333; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, "Helvetica Neue", "Hiragino Kaku Gothic ProN", sans-serif; margin: 0; background: var(--bg); color: #333; -webkit-tap-highlight-color: transparent; }
 
-        /* --- 偽裝登入 UI --- */
+        /* --- 偽装ログイン UI --- */
         #login-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; overflow-y: auto; }
         .nav-bar { background: #fff; border-bottom: 1px solid #ddd; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo { color: var(--main-blue); font-size: 18px; font-weight: bold; text-decoration: none; }
@@ -28,7 +28,7 @@
         .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; }
         .social-btn { padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; color: #555; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* --- 內部主程式 UI --- */
+        /* --- アプリケーション UI (全日本語化) --- */
         #app { display: none; padding: 10px; max-width: 500px; margin: auto; padding-bottom: 40px; background: #fffbf5; min-height: 100vh; }
         .header { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
         .btn-nav { background: var(--main-blue); border: none; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
@@ -38,7 +38,7 @@
         
         .day-cell { min-height: 85px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; }
         
-        /* 框線顏色優先順位 */
+        /* 枠線表示の優先順位設定 */
         .selected-day { border: 2.5px solid var(--main-blue) !important; background-color: var(--select-highlight) !important; }
         .hi-red { border: 2.5px solid var(--s-red) !important; background: #fff0f0 !important; }
         .hi-rainbow { border: 2.5px solid transparent !important; background: linear-gradient(white, white) padding-box, linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) border-box !important; }
@@ -49,20 +49,20 @@
         .star-j { color: var(--j-green); font-size: 18px; }
         .heart-mark { position: absolute; bottom: 4px; right: 4px; font-size: 14px; }
 
-        /* 面板與元件 */
+        /* 詳細パネルと予定管理 */
         #details-panel { margin-top: 20px; background: white; border-radius: 25px; padding: 15px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--main-blue); }
         .task-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; background: #f9f9f9; padding: 10px; border-radius: 12px; position: relative; }
         .input-group { display: flex; gap: 8px; align-items: center; }
         .time-in { border: 1px solid #ddd; border-radius: 8px; padding: 8px 5px; width: 100px; font-size: 16px; background: #fff; }
         .task-in { flex: 1; border: none; background: transparent; padding: 5px; font-size: 16px; outline: none; border-bottom: 1px solid #eee; }
-        .phx-info { font-size: 11px; color: #0056b3; font-weight: bold; background: #e7f3ff; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-top: 5px; }
+        .phx-info { font-size: 12px; color: #0056b3; font-weight: bold; background: #e7f3ff; padding: 6px 10px; border-radius: 6px; display: inline-block; margin-top: 5px; }
         
-        /* 功能按鈕 */
+        /* メニューボタン */
         .btn-menu { display: flex; gap: 8px; margin: 20px 0; justify-content: center; }
         .icon-btn { width: 45px; height: 45px; border-radius: 50%; border: 2px solid #eee; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #eee; cursor: pointer; }
         .active-heart { color: #ff69b4; border-color: #ff69b4; background: #fff5f7; }
         .active-red { border-color: var(--s-red); background: #fff0f0; color: var(--s-red); }
-        .active-rainbow { border: 2px solid orange !important; color: #000; }
+        .active-rainbow { border: 2.5px solid orange !important; color: #000; }
         .active-black { border-color: #000; background: #eee; color: #000; }
         .active-business { border-color: #333; color: #333; background: #f0f0f0; }
 
@@ -72,12 +72,12 @@
 <body>
 
 <div id="login-screen">
-    <div class="nav-bar"><a href="#" class="logo">JHSL 售票系統</a></div>
+    <div class="nav-bar"><a href="#" class="logo">JHSL チケットシステム</a></div>
     <div class="login-container">
-        <div style="font-size: 20px; font-weight: bold; margin-bottom: 30px;">會員登入</div>
-        <input type="text" class="form-input" placeholder="帳號 / 電子郵件">
-        <input type="password" id="pwd" class="form-input" placeholder="請輸入密碼">
-        <button onclick="checkLogin()" class="primary-btn">確認登入</button>
+        <div style="font-size: 20px; font-weight: bold; margin-bottom: 30px;">会員ログイン</div>
+        <input type="text" class="form-input" placeholder="ID / メールアドレス">
+        <input type="password" id="pwd" class="form-input" placeholder="パスワードを入力">
+        <button onclick="checkLogin()" class="primary-btn">ログイン</button>
         <div class="social-grid">
             <div class="social-btn">f Facebook</div><div class="social-btn">G Google</div>
             <div class="social-btn">𝕏 Twitter</div><div class="social-btn"> Apple</div>
@@ -95,21 +95,23 @@
 
     <div id="details-panel" style="display:none;">
         <div id="date-label" style="text-align:center; font-weight:bold; color:#999; margin-bottom:15px; font-size:18px;"></div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span style="color:var(--j-green); font-weight:bold;">J</span><button onclick="addRRow('j')" style="font-size:12px;">+ 追加</button></div>
+        
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span style="color:var(--j-green); font-weight:bold;">J</span><button onclick="addRRow('j')" style="font-size:12px;">+ 予定追加</button></div>
         <div id="j-tasks"></div>
-        <div style="display:flex; justify-content:space-between; margin:15px 0 10px;"><span style="color:var(--s-red); font-weight:bold;">S</span><button onclick="addRRow('s')" style="font-size:12px;">+ 追加</button></div>
+        
+        <div style="display:flex; justify-content:space-between; margin:15px 0 10px;"><span style="color:var(--s-red); font-weight:bold;">S</span><button onclick="addRRow('s')" style="font-size:12px;">+ 予定追加</button></div>
         <div id="s-tasks"></div>
 
         <div class="btn-menu">
             <button class="icon-btn" id="heart-btn" onclick="this.classList.toggle('active-heart')">💞</button>
-            <button class="icon-btn" id="red-btn" onclick="toggleFrame('red')">□</button>
-            <button class="icon-btn" id="rainbow-btn" onclick="toggleFrame('rainbow')">✈️</button>
-            <button class="icon-btn" id="black-btn" onclick="toggleFrame('black')">■</button>
+            <button class="icon-btn" id="red-btn" onclick="this.classList.toggle('active-red')">□</button>
+            <button class="icon-btn" id="rainbow-btn" onclick="this.classList.toggle('active-rainbow')">✈️</button>
+            <button class="icon-btn" id="black-btn" onclick="this.classList.toggle('active-black')">■</button>
             <button class="icon-btn" id="business-btn" onclick="this.classList.toggle('active-business')">💼</button>
         </div>
 
-        <textarea id="memo-input" style="width:100%; min-height:80px; border:1px solid #eee; border-radius:12px; padding:10px; font-size:15px;" placeholder="📝 留言/筆記..."></textarea>
-        <button class="submit-btn" onclick="save()">更新資料並同步 / 完了</button>
+        <textarea id="memo-input" style="width:100%; min-height:80px; border:1px solid #eee; border-radius:12px; padding:10px; font-size:15px;" placeholder="📝 メッセージ / 備考を残す..."></textarea>
+        <button class="submit-btn" onclick="save()">データを更新してクラウド同期</button>
     </div>
 </div>
 
@@ -130,7 +132,7 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             startSync();
-        } else { alert('帳號或密碼錯誤'); }
+        } else { alert('アカウント名またはパスワードが正しくありません'); }
     }
 
     function startSync() {
@@ -141,13 +143,10 @@
         });
     }
 
-    function toggleFrame(type) {
-        const btnRed = document.getElementById('red-btn');
-        const btnRain = document.getElementById('rainbow-btn');
-        const btnBlack = document.getElementById('black-btn');
-        if(type === 'red') { btnRed.classList.toggle('active-red'); btnRain.classList.remove('active-rainbow'); btnBlack.classList.remove('active-black'); }
-        if(type === 'rainbow') { btnRain.classList.toggle('active-rainbow'); btnRed.classList.remove('active-red'); btnBlack.classList.remove('active-black'); }
-        if(type === 'black') { btnBlack.classList.toggle('active-black'); btnRed.classList.remove('active-red'); btnRain.classList.remove('active-rainbow'); }
+    // 曜日の日本語変換ヘルパー
+    function getDayJP(y, m, d) {
+        const days = ['日', '月', '火', '水', '木', '金', '土'];
+        return days[new Date(y, m - 1, d).getDay()];
     }
 
     function render() {
@@ -166,7 +165,7 @@
             
             const dAt = cloudData[s] || {j:[], s:[], red:false, rainbow:false, black:false, business:false, heart:false};
             
-            // 框線邏輯 (優先權：紅 > 彩 > 黑)
+            // 枠線優先順位：赤 > 虹 > 黒
             if(dAt.red) cell.classList.add('hi-red');
             else if(dAt.rainbow) cell.classList.add('hi-rainbow');
             else if(dAt.black) cell.classList.add('hi-black');
@@ -185,15 +184,21 @@
         }
     }
 
+    // 鳳凰城時間表示の最適化
     function getPHX(dateStr, timeStr) {
         if(!timeStr) return "--";
         const [y, m, d] = dateStr.split('-').map(Number);
         const [hh, mm] = timeStr.split(':').map(Number);
         const local = new Date(y, m - 1, d, hh, mm);
         const phx = new Date(local.getTime() - (15 * 60 * 60 * 1000));
-        const py = phx.getFullYear(), pm = String(phx.getMonth() + 1).padStart(2, '0');
-        const pd = String(phx.getDate()).padStart(2, '0'), ph = String(phx.getHours()).padStart(2, '0');
-        return `${py}-${pm}-${pd} ${ph}:00 (PHX)`;
+        
+        const py = phx.getFullYear();
+        const pm = String(phx.getMonth() + 1).padStart(2, '0');
+        const pd = String(phx.getDate()).padStart(2, '0');
+        const ph = String(phx.getHours()).padStart(2, '0');
+        const pDay = getDayJP(py, pm, pd);
+        
+        return `PHX:${py}/${pm}/${pd}(${pDay}) ${ph}:00`;
     }
 
     function updatePhxDisplay(input) {
@@ -203,7 +208,11 @@
 
     function show(s, soft = false) {
         document.getElementById('details-panel').style.display = 'block';
-        document.getElementById('date-label').innerText = s;
+        const [y, m, d] = s.split('-').map(Number);
+        const dayLabel = getDayJP(y, m, d);
+        // 日付ラベルの形式変更
+        document.getElementById('date-label').innerText = `${y}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}(${dayLabel})`;
+        
         const dAt = cloudData[s] || {j:[], s:[], red:false, rainbow:false, black:false, business:false, heart:false, memo:""};
         if(!soft) {
             const rend = (id, list) => {
@@ -214,7 +223,6 @@
             rend('j-tasks', dAt.j); rend('s-tasks', dAt.s);
             document.getElementById('memo-input').value = dAt.memo || "";
             
-            // 設定按鈕狀態
             const u = (id, a, c) => { const b = document.getElementById(id); if(a) b.classList.add(c); else b.classList.remove(c); };
             u('heart-btn', dAt.heart, 'active-heart');
             u('red-btn', dAt.red, 'active-red');
@@ -229,9 +237,9 @@
         div.innerHTML = `
             <div class="input-group">
                 <input type="time" class="time-in t-time" value="${time}" oninput="updatePhxDisplay(this)">
-                <input type="text" class="task-in t-text" value="${text}" placeholder="內容">
+                <input type="text" class="task-in t-text" value="${text}" placeholder="予定内容を入力">
             </div>
-            <div class="phx-info">🇺🇸 PHX: <span class="phx-val">${getPHX(selDate, time)}</span></div>
+            <div class="phx-info"><span class="phx-val">${getPHX(selDate, time)}</span></div>
             <button onclick="this.parentElement.remove()" style="position:absolute; top:5px; right:5px; border:none; background:none; color:#ccc;">🗑️</button>
         `;
         document.getElementById(type + '-tasks').appendChild(div);
@@ -253,10 +261,9 @@
             heart: document.getElementById('heart-btn').classList.contains('active-heart'),
             memo: document.getElementById('memo-input').value
         };
-        db.ref('calendar/' + selDate).set(dAt).then(() => alert("更新完了"));
+        db.ref('calendar/' + selDate).set(dAt).then(() => alert("更新完了。"));
     }
     function changeMonth(n) { curMonth.setMonth(curMonth.getMonth() + n); render(); }
 </script>
 </body>
 </html>
-
