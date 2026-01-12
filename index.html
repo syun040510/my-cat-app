@@ -1,27 +1,44 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>エスアンドジェイカレンダー</title>
+    <title>JHSL 售票系統 - 會員登入</title>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        :root { --orange: #ffb366; --s-red: #ff0000; --j-green: #006400; --bg: #fffbf5; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); -webkit-tap-highlight-color: transparent; }
-        #login-screen { position: fixed; inset: 0; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
-        .login-input { padding: 15px; border-radius: 15px; border: 2px solid #ddd; text-align:center; font-size: 18px; width: 220px; outline: none; }
-        .login-btn { margin-top: 25px; padding: 15px 70px; background: var(--orange); border: none; border-radius: 35px; color: white; font-weight: bold; font-size: 18px; }
+        :root { --main-blue: #0056b3; --gray: #6c757d; --bg: #f8f9fa; --s-red: #ff0000; --j-green: #006400; --orange-theme: #ffb366; }
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; margin: 0; background: var(--bg); color: #333; -webkit-tap-highlight-color: transparent; }
 
-        #app { display: none; padding: 10px; max-width: 500px; margin: auto; padding-bottom: 40px; }
+        /* 偽裝售票系統登入頁面 */
+        #login-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; overflow-y: auto; }
+        .nav-bar { background: #fff; border-bottom: 1px solid #ddd; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { color: var(--main-blue); font-size: 20px; font-weight: bold; text-decoration: none; }
+        .nav-links { font-size: 13px; color: var(--gray); display: flex; gap: 15px; }
+        
+        .login-container { max-width: 400px; margin: 40px auto; padding: 20px; text-align: center; }
+        .login-title { font-size: 22px; font-weight: bold; margin-bottom: 30px; color: #444; }
+        .form-group { text-align: left; margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; margin-bottom: 5px; color: #666; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; outline: none; }
+        .form-input:focus { border-color: var(--main-blue); }
+        
+        .primary-btn { width: 100%; padding: 14px; background: var(--main-blue); border: none; border-radius: 4px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .divider { border-top: 1px solid #eee; margin: 30px 0; position: relative; }
+        .divider::after { content: "或使用以下方式登入"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 10px; font-size: 12px; color: #999; }
+        
+        .social-btn { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; background: #fff; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; color: #555; cursor: pointer; }
+        .footer-text { font-size: 12px; color: #999; margin-top: 40px; }
+
+        /* 內部主應用程式 (全日文保持不變) */
+        #app { display: none; padding: 10px; max-width: 500px; margin: auto; padding-bottom: 40px; background: #fffbf5; min-height: 100vh; }
         .header { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
-        .btn-nav { background: var(--orange); border: none; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+        .btn-nav { background: var(--orange-theme); border: none; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: white; padding: 8px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .weekday { text-align: center; font-size: 12px; color: #999; padding-bottom: 5px; font-weight: bold; }
         .day-cell { min-height: 85px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; }
         
-        /* 填色優先順位 */
         .hi-red { border: 2.5px solid var(--s-red) !important; background: #fff0f0 !important; }
         .hi-rainbow { border: 2.5px solid transparent !important; background: linear-gradient(white, white) padding-box, linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) border-box !important; }
         .hi-black { border: 2.5px solid #000 !important; background: #d3d3d3 !important; }
@@ -32,15 +49,12 @@
         .star-j { color: var(--j-green); font-size: 18px; }
         .heart-mark { position: absolute; bottom: 4px; right: 4px; font-size: 14px; color: #ffb6c1; }
 
-        #details-panel { margin-top: 20px; background: white; border-radius: 25px; padding: 15px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--orange); }
-        .j-title { color: var(--j-green); font-weight: bold; }
-        .s-title { color: var(--s-red); font-weight: bold; }
-
+        #details-panel { margin-top: 20px; background: white; border-radius: 25px; padding: 15px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--orange-theme); }
         .task-row { display: flex; gap: 5px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 5px; border-radius: 10px; }
         .time-in { border: 1px solid #ddd; border-radius: 8px; padding: 5px; width: 75px; font-size: 13px; }
         .task-in { flex: 1; border: none; background: transparent; padding: 5px; font-size: 16px; outline: none; }
         
-        .btn-menu { display: flex; gap: 8px; margin: 25px 0 10px; justify-content: center; }
+        .btn-menu { display: flex; gap: 8px; margin: 20px 0 10px; justify-content: center; }
         .icon-btn { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #eee; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #eee; }
         .active-heart { color: #ff69b4; border-color: #ff69b4; background: #fff5f7; }
         .active-red { border-color: var(--s-red); background: #fff0f0; }
@@ -48,20 +62,41 @@
         .active-black { border-color: #000; background: #eee; color: #000; }
         .active-emoji { border-color: #333; color: #333; }
 
-        /* 留言板樣式 */
-        .memo-section { margin-top: 20px; padding-top: 15px; border-top: 1px dashed #eee; }
-        .memo-title { font-size: 15px; font-weight: bold; color: #666; display: flex; align-items: center; gap: 5px; }
-        .memo-area { width: 100%; min-height: 100px; border: 1px solid #eee; border-radius: 12px; padding: 10px; margin-top: 8px; font-size: 15px; outline: none; box-sizing: border-box; resize: none; background: #fdfdfd; line-height: 1.5; color: #444; }
-        .memo-area:focus { border-color: var(--orange); background: #fff; }
+        .memo-area { width: 100%; min-height: 100px; border: 1px solid #eee; border-radius: 12px; padding: 10px; margin-top: 8px; font-size: 15px; outline: none; box-sizing: border-box; resize: none; background: #fdfdfd; }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <div style="font-size: 50px; margin-bottom: 10px;">😽</div>
-    <div style="color:var(--orange); font-weight:bold; margin-bottom:20px;">エスアンドジェイカレンダー</div>
-    <input type="password" id="pwd" placeholder="パスワード" class="login-input">
-    <button onclick="checkLogin()" class="login-btn">ログイン</button>
+    <div class="nav-bar">
+        <a href="#" class="logo">JHSL 售票系統</a>
+        <div class="nav-links">
+            <span>購票流程</span>
+            <span>常見問題</span>
+        </div>
+    </div>
+    <div class="login-container">
+        <div class="login-title">會員登入</div>
+        <div class="form-group">
+            <label class="form-label">電子郵件 / 帳號</label>
+            <input type="text" id="acc" class="form-input" placeholder="example@mail.com">
+        </div>
+        <div class="form-group">
+            <label class="form-label">密碼</label>
+            <input type="password" id="pwd" class="form-input" placeholder="請輸入密碼">
+        </div>
+        <button onclick="checkLogin()" class="primary-btn">登入</button>
+        
+        <div class="divider"></div>
+        
+        <div class="social-btn"><span>🔵</span> 使用 Facebook 登入</div>
+        <div class="social-btn"><span>🔴</span> 使用 Google 登入</div>
+        
+        <div class="footer-text">
+            © 2026 JHSL Ticketing Service. <br>
+            隱私權政策 | 服務條款
+        </div>
+    </div>
 </div>
 
 <div id="app">
@@ -74,13 +109,10 @@
 
     <div id="details-panel" style="display:none;">
         <div id="date-label" style="text-align:center; font-weight:bold; color:#888; margin-bottom:15px;"></div>
-        
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span class="j-title">J</span><button onclick="addR('j')" style="font-size:11px;">+ 追加</button></div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="color:var(--j-green); font-weight:bold;">J</span><button onclick="addR('j')" style="font-size:11px;">+ 追加</button></div>
         <div id="j-tasks"></div>
-        
-        <div style="display:flex; justify-content:space-between; margin:15px 0 5px;"><span class="s-title">S</span><button onclick="addR('s')" style="font-size:11px;">+ 追加</button></div>
+        <div style="display:flex; justify-content:space-between; margin:15px 0 5px;"><span style="color:var(--s-red); font-weight:bold;">S</span><button onclick="addR('s')" style="font-size:11px;">+ 追加</button></div>
         <div id="s-tasks"></div>
-
         <div class="btn-menu">
             <button class="icon-btn" id="heart-btn" onclick="toggleBtn(this, 'active-heart')">💞</button>
             <button class="icon-btn" id="red-btn" onclick="toggleBtn(this, 'active-red')">□</button>
@@ -88,9 +120,8 @@
             <button class="icon-btn" id="black-btn" onclick="toggleBtn(this, 'active-black')">■</button>
             <button class="icon-btn" id="emoji-btn" onclick="toggleBtn(this, 'active-emoji')">😆</button>
         </div>
-
-        <div class="memo-section">
-            <div class="memo-title">📝 メッセージ / メモ</div>
+        <div style="margin-top:20px; border-top:1px dashed #eee; padding-top:10px;">
+            <div style="font-size:14px; font-weight:bold; color:#666;">📝 メッセージ / メモ</div>
             <textarea id="memo-input" class="memo-area" placeholder="ここにメッセージを残せます..." onchange="save()"></textarea>
         </div>
     </div>
@@ -110,11 +141,15 @@
     let curMonth = new Date(), selDate = "", cloudData = {};
 
     function checkLogin() {
-        if (document.getElementById('pwd').value === '20190927') {
+        const password = document.getElementById('pwd').value.trim();
+        // 使用原有的日期密碼
+        if (password === '20190927') {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             startSync();
-        } else { alert('パスワードが違います'); }
+        } else { 
+            alert('帳號或密碼錯誤，請再試一次。'); // 售票系統風格的提示
+        }
     }
 
     function startSync() {
@@ -166,17 +201,13 @@
         selDate = s; document.getElementById('details-panel').style.display = 'block';
         document.getElementById('date-label').innerText = s;
         const dAt = cloudData[s] || {j:[], s:[], red:false, rainbow:false, black:false, emoji:false, heart:false, memo:""};
-        
         const rendT = (id, list) => {
             const c = document.getElementById(id); c.innerHTML = "";
             (list || []).forEach(t => addRow(id.split('-')[0], t.time, t.text));
             if(!list || list.length === 0) addRow(id.split('-')[0], "", "");
         };
         rendT('j-tasks', dAt.j); rendT('s-tasks', dAt.s);
-        
-        // 留言板內容載入
         document.getElementById('memo-input').value = dAt.memo || "";
-
         const u = (id, a, c) => { const b = document.getElementById(id); if(a) b.classList.add(c); else b.classList.remove(c); };
         u('heart-btn', dAt.heart, 'active-heart'); u('red-btn', dAt.red, 'active-red'); u('rainbow-btn', dAt.rainbow, 'active-rainbow'); u('black-btn', dAt.black, 'active-black'); u('emoji-btn', dAt.emoji, 'active-emoji');
     }
@@ -189,7 +220,6 @@
 
     function addR(type) { addRow(type, "", ""); }
     function toggleBtn(b, cls) { b.classList.toggle(cls); save(); }
-
     function save() {
         if(!selDate) return;
         const getT = (id) => Array.from(document.getElementById(id).querySelectorAll('.task-row')).map(r => ({ time: r.querySelector('.t-time').value, text: r.querySelector('.t-text').value })).filter(t => t.time || t.text);
@@ -200,7 +230,7 @@
             rainbow: document.getElementById('rainbow-btn').classList.contains('active-rainbow'),
             black: document.getElementById('black-btn').classList.contains('active-black'),
             emoji: document.getElementById('emoji-btn').classList.contains('active-emoji'),
-            memo: document.getElementById('memo-input').value // 留言儲存
+            memo: document.getElementById('memo-input').value
         };
         db.ref('calendar/' + selDate).set(dAt);
     }
