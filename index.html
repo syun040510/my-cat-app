@@ -8,16 +8,13 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        :root { 
-            --main-blue: #0056b3; --gray: #6c757d; --bg: #f8f9fa; --s-red: #ff0000; --j-green: #006400; --select-highlight: #e0f0ff;
-        }
-        body { font-family: -apple-system, "Helvetica Neue", "Hiragino Kaku Gothic ProN", "Microsoft JhengHei", sans-serif; margin: 0; background: var(--bg); color: #333; -webkit-tap-highlight-color: transparent; }
+        :root { --main-blue: #0056b3; --gray: #6c757d; --bg: #f8f9fa; --s-red: #ff0000; --j-green: #006400; --select-highlight: #e0f0ff; }
+        body { font-family: -apple-system, "PingFang TC", sans-serif; margin: 0; background: var(--bg); color: #333; -webkit-tap-highlight-color: transparent; }
 
         /* --- 登入介面 (繁體中文偽裝) --- */
         #login-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; overflow-y: auto; }
         .nav-bar { background: #fff; border-bottom: 1px solid #ddd; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; }
         .logo { color: var(--main-blue); font-size: 18px; font-weight: bold; text-decoration: none; }
-        .nav-links { font-size: 12px; color: var(--gray); display: flex; gap: 10px; }
         .login-container { max-width: 400px; margin: 30px auto; padding: 20px; text-align: center; }
         .form-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; margin-bottom: 15px; outline: none; }
         .primary-btn { width: 100%; padding: 14px; background: var(--main-blue); border: none; border-radius: 4px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
@@ -26,12 +23,10 @@
 
         /* --- 日程管理介面 (日文) --- */
         #app { display: none; padding: 10px; max-width: 500px; margin: auto; padding-bottom: 60px; background: #fffbf5; min-height: 100vh; }
+        .notice-bar { background: #fff4e5; border: 1px solid #ffcc80; padding: 10px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; color: #e65100; display: none; line-height: 1.5; }
         .header { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
         .btn-nav { background: var(--main-blue); border: none; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
         
-        /* 倒數提示區 (支持多行) */
-        .notice-bar { background: #fff4e5; border: 1px solid #ffcc80; padding: 10px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; color: #e65100; display: none; line-height: 1.5; }
-
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: white; padding: 8px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .weekday { text-align: center; font-size: 12px; color: #999; font-weight: bold; }
         .day-cell { min-height: 95px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; }
@@ -42,11 +37,10 @@
         .hi-black { border: 2.5px solid #000 !important; }
 
         .day-num { font-size: 14px; font-weight: bold; }
-        .mood-j { font-size: 11px; color: var(--j-green); font-weight: bold; }
-        .mood-s { font-size: 11px; color: var(--s-red); font-weight: bold; }
-        /* 星星樣式 */
         .star-j { color: var(--j-green); font-size: 18px; }
         .star-s { color: var(--s-red); font-size: 18px; }
+        .mood-j { font-size: 11px; color: var(--j-green); font-weight: bold; }
+        .mood-s { font-size: 11px; color: var(--s-red); font-weight: bold; }
         .anniv-icon { position: absolute; top: 4px; right: 4px; font-size: 12px; }
 
         #details-panel { margin-top: 20px; background: white; border-radius: 25px; padding: 15px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--main-blue); }
@@ -65,7 +59,6 @@
         .active-business { border-color: #333; color: #333; background: #f0f0f0; }
 
         .submit-btn { width: 100%; padding: 15px; background: var(--main-blue); border: none; border-radius: 12px; color: white; font-weight: bold; font-size: 16px; margin-top: 20px; cursor: pointer; }
-        
         .full-screen { display: none; position: fixed; inset: 0; background: #f0f7ff; z-index: 5000; overflow-y: auto; padding: 20px 10px; }
         .wish-item { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
         .wish-input { width: 100%; padding: 10px; margin-bottom: 8px; border: 1px solid #eee; border-radius: 8px; box-sizing: border-box; }
@@ -79,7 +72,8 @@
         <div class="nav-links"><span>首頁</span><span>購票流程</span><span>常見問題</span><span>會員中心</span></div>
     </div>
     <div class="login-container">
-        <div class="login-title">會員登入</div>
+        <div class="login-title" style="font-size:20px; font-weight:bold; margin-bottom:25px;">會員登入</div>
+        <input type="text" class="form-input" placeholder="電子郵件 / 帳號">
         <input type="password" id="pwd" class="form-input" placeholder="請輸入密碼">
         <button onclick="checkLogin()" class="primary-btn">確認登入</button>
         <div class="social-grid">
@@ -91,7 +85,6 @@
 
 <div id="app">
     <div id="anniv-notice" class="notice-bar"></div>
-
     <div class="header">
         <button onclick="changeMonth(-1)" class="btn-nav">◀</button>
         <h2 id="month-display" style="font-size: 18px; margin:0; color:var(--main-blue);"></h2>
@@ -132,43 +125,26 @@
 <div id="screen-wish" class="full-screen">
     <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2>行きたいリスト</h2><button onclick="closeFull('wish')">✕</button></div>
     <div id="wish-main-cat">
-        <div class="wish-item" onclick="showWishSub('food')">🍴 飲食店</div>
-        <div class="wish-item" onclick="showWishSub('place')">📍 場所</div>
-        <div class="wish-item" onclick="showWishSub('event')">🎟️ イベント</div>
-        <div class="wish-item" onclick="showWishSub('plan')">📝 仮行程</div>
+        <div class="wish-item" onclick="showWishSub('food')">🍴 飲食店</div><div class="wish-item" onclick="showWishSub('place')">📍 場所</div><div class="wish-item" onclick="showWishSub('event')">🎟️ イベント</div><div class="wish-item" onclick="showWishSub('plan')">📝 仮行程</div>
     </div>
-    <div id="wish-sub-page" style="display:none;">
-        <button onclick="backToWishMain()">← 戻る</button> <button id="add-wish-btn" style="float:right;">+ 追加</button>
-        <div id="wish-items-container" style="margin-top:20px;"></div>
-        <button class="submit-btn" id="save-wish-btn">リストを保存</button>
-    </div>
+    <div id="wish-sub-page" style="display:none;"><button onclick="backToWishMain()">← 戻る</button> <div id="wish-items-container" style="margin-top:20px;"></div><button id="add-wish-btn">+ 追加</button><button class="submit-btn" id="save-wish-btn">リストを保存</button></div>
 </div>
 
 <div id="screen-event" class="full-screen">
     <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2>重要日管理</h2><button onclick="closeFull('event')">✕</button></div>
     <div style="background:white; padding:15px; border-radius:15px; margin-bottom:20px;">
-        <input type="date" id="ev-date" class="form-input">
-        <input type="text" id="ev-name" class="form-input" placeholder="記念日名稱">
-        <select id="ev-type" class="form-input"><option value="anniv">🎂 記念日</option><option value="ticket">🔔 預約</option></select>
-        <button class="primary-btn" onclick="addEvent()">追加保存</button>
+        <input type="date" id="ev-date" class="form-input"><input type="text" id="ev-name" class="form-input" placeholder="名稱"><select id="ev-type" class="form-input"><option value="anniv">🎂 記念日</option><option value="ticket">🔔 預約</option></select><button class="primary-btn" onclick="addEvent()">追加保存</button>
     </div>
     <div id="event-list-container"></div>
 </div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyA6AW2Lt_SuxNTeEBe6ZUAtSvkpVT96PAM",
-        authDomain: "sjcalender-78d2a.firebaseapp.com",
-        databaseURL: "https://sjcalender-78d2a-default-rtdb.firebaseio.com",
-        projectId: "sjcalender-78d2a",
-        appId: "1:658651415692:web:3cf9aac6840eebc6e027a9"
-    };
+    const firebaseConfig = { apiKey: "AIzaSyA6AW2Lt_SuxNTeEBe6ZUAtSvkpVT96PAM", authDomain: "sjcalender-78d2a.firebaseapp.com", databaseURL: "https://sjcalender-78d2a-default-rtdb.firebaseio.com", projectId: "sjcalender-78d2a", appId: "1:658651415692:web:3cf9aac6840eebc6e027a9" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let curMonth = new Date(), selDate = "", cloudData = {}, eventData = {}, wishlistData = {};
 
     function checkLogin() { if (document.getElementById('pwd').value === '20190927') { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app').style.display = 'block'; startSync(); } else { alert('密碼錯誤'); } }
-
     function startSync() {
         db.ref('calendar').on('value', snap => { cloudData = snap.val() || {}; render(); if(selDate) show(selDate, true); });
         db.ref('events').on('value', snap => { eventData = snap.val() || {}; updateNotice(); render(); renderEventList(); });
@@ -185,55 +161,49 @@
             if(s === selDate) cell.classList.add('selected-day');
             const dAt = cloudData[s] || {};
             if(dAt.red) cell.classList.add('hi-red'); else if(dAt.rainbow) cell.classList.add('hi-rainbow'); else if(dAt.black) cell.classList.add('hi-black');
-            
-            const ev = Object.values(eventData).find(e => {
-                const parts = e.date.split('-');
-                return parts[1] == (m+1) && parts[2] == d;
-            });
-
-            // 星星顯示邏輯更新：不論行程數，只顯示一個
+            const ev = Object.values(eventData).find(e => e.date.split('-')[1]==(m+1) && e.date.split('-')[2]==d);
+            // 單星顯示
             const jS = (dAt.j && dAt.j.length > 0) ? '<span class="star-j">★</span>' : '';
             const sS = (dAt.s && dAt.s.length > 0) ? '<span class="star-s">★</span>' : '';
-            
-            cell.innerHTML = `
-                <div class="day-num">${d}</div>
-                ${ev?`<span class="anniv-icon">${ev.type==='anniv'?'🎂':'🔔'}</span>`:''}
-                <div style="display:flex; gap:2px;">${jS}${sS}</div>
-                <div><span class="mood-j">${dAt.moodJ||''}</span> <span class="mood-s">${dAt.moodS||''}</span></div>
-                <div>${dAt.business?'💼':''}</div>
-                ${dAt.heart?'<span class="heart-mark">💞</span>':''}`;
+            cell.innerHTML = `<div class="day-num">${d}</div>${ev?`<span class="anniv-icon">${ev.type==='anniv'?'🎂':'🔔'}</span>`:''}<div style="display:flex; gap:2px;">${jS}${sS}</div><div><span class="mood-j">${dAt.moodJ||''}</span> <span class="mood-s">${dAt.moodS||''}</span></div><div>${dAt.business?'💼':''}</div>${dAt.heart?'<span class="heart-mark">💞</span>':''}`;
             cell.onclick = () => { selDate = s; render(); show(s); }; grid.appendChild(cell);
         }
     }
 
-    // 提醒列邏輯更新：顯示最近三個
     function updateNotice() {
         const today = new Date().setHours(0,0,0,0); const nowYear = new Date().getFullYear();
         const list = Object.values(eventData).map(e => {
-            const parts = e.date.split('-').map(Number);
-            let target = new Date(nowYear, parts[1] - 1, parts[2]).getTime();
-            if (target < today) target = new Date(nowYear + 1, parts[1] - 1, parts[2]).getTime();
+            const [_, m, d] = e.date.split('-').map(Number);
+            let target = new Date(nowYear, m - 1, d).getTime();
+            if (target < today) target = new Date(nowYear + 1, m - 1, d).getTime();
             return { ...e, diff: Math.ceil((target - today) / (1000*60*60*24)) };
-        }).sort((a,b) => a.diff - b.diff);
-
+        }).sort((a,b) => a.diff - b.diff).slice(0, 3);
         const bar = document.getElementById('anniv-notice');
-        if(list.length > 0) {
-            // 取得前三個提醒
-            const topThree = list.slice(0, 3).map(e => `🔔 ${e.name} (あと ${e.diff} 日)`);
-            bar.innerHTML = topThree.join('<br>'); // 以換行分隔
-            bar.style.display = 'block';
-        } else { bar.style.display = 'none'; }
+        if(list.length > 0) { bar.innerHTML = list.map(e => `🔔 ${e.name} (あと ${e.diff} 日)`).join('<br>'); bar.style.display = 'block'; }
     }
 
+    // 核心優化：時間排序功能
     function show(s, soft = false) {
         document.getElementById('details-panel').style.display = 'block';
         const [y, m, d] = s.split('-').map(Number);
         const dayJP = ['日','月','火','水','木','金','土'][new Date(y, m-1, d).getDay()];
         document.getElementById('date-label').innerText = `${y}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}(${dayJP})`;
-        const dAt = cloudData[s] || {moodJ:"", moodS:"", memo:""};
+        const dAt = cloudData[s] || { moodJ:"", moodS:"", memo:"" };
         if(!soft) {
-            const rend = (id, list) => { const c = document.getElementById(id); c.innerHTML = ""; (list || []).forEach(t => addRow(id.split('-')[0], t.time, t.text)); if(!list || list.length === 0) addRow(id.split('-')[0], "", ""); };
-            rend('j-tasks', dAt.j); rend('s-tasks', dAt.s); document.getElementById('mood-j').value = dAt.moodJ || ""; document.getElementById('mood-s').value = dAt.moodS || ""; document.getElementById('memo-input').value = dAt.memo || "";
+            const sortList = (list) => (list || []).sort((a, b) => {
+                if (!a.time && !b.time) return 0;
+                if (!a.time) return -1; // 無時間優先置頂
+                if (!b.time) return 1;
+                return a.time.localeCompare(b.time); // 按時間升序
+            });
+            const rend = (id, list) => {
+                const c = document.getElementById(id); c.innerHTML = "";
+                const sorted = sortList(list);
+                sorted.forEach(t => addRow(id.split('-')[0], t.time, t.text));
+                if(!sorted || sorted.length === 0) addRow(id.split('-')[0], "", "");
+            };
+            rend('j-tasks', dAt.j); rend('s-tasks', dAt.s);
+            document.getElementById('mood-j').value = dAt.moodJ || ""; document.getElementById('mood-s').value = dAt.moodS || ""; document.getElementById('memo-input').value = dAt.memo || "";
             const u = (id, a, c) => { const b = document.getElementById(id); if(a) b.classList.add(c); else b.classList.remove(c); };
             u('heart-btn', dAt.heart, 'active-heart'); u('red-btn', dAt.red, 'active-red'); u('rainbow-btn', dAt.rainbow, 'active-rainbow'); u('black-btn', dAt.black, 'active-black'); u('business-btn', dAt.business, 'active-business');
         }
@@ -246,18 +216,15 @@
         document.getElementById(type + '-tasks').appendChild(div);
     }
     function addRRow(type) { addRow(type, "", ""); }
-
     function save() {
         const getT = (id) => Array.from(document.getElementById(id).querySelectorAll('.task-row')).map(r => ({ time: r.querySelector('.t-time').value, text: r.querySelector('.t-text').value })).filter(t => t.time || t.text);
         const dAt = { j: getT('j-tasks'), s: getT('s-tasks'), moodJ: document.getElementById('mood-j').value, moodS: document.getElementById('mood-s').value, red: document.getElementById('red-btn').classList.contains('active-red'), rainbow: document.getElementById('rainbow-btn').classList.contains('active-rainbow'), black: document.getElementById('black-btn').classList.contains('active-black'), business: document.getElementById('business-btn').classList.contains('active-business'), heart: document.getElementById('heart-btn').classList.contains('active-heart'), memo: document.getElementById('memo-input').value };
         db.ref('calendar/' + selDate).set(dAt).then(() => alert("更新完了"));
     }
-
     function openFull(id) { document.getElementById('screen-' + id).style.display = 'block'; if(id==='wish') showWishSub('food'); }
     function closeFull(id) { document.getElementById('screen-' + id).style.display = 'none'; }
     function addEvent() { const date = document.getElementById('ev-date').value, name = document.getElementById('ev-name').value; if(!date||!name) return; db.ref('events').push({ date: date.split('-').map(Number).join('-'), name, type: document.getElementById('ev-type').value }); }
     function renderEventList() { const c = document.getElementById('event-list-container'); c.innerHTML = ""; Object.entries(eventData).forEach(([id, ev]) => { const d = document.createElement('div'); d.className = 'wish-item'; d.innerHTML = `${ev.type==='anniv'?'🎂':'🔔'} ${ev.name} (${ev.date}) <button onclick="db.ref('events/${id}').remove()" style="float:right; color:red;">🗑️</button>`; c.appendChild(d); }); }
-
     function showWishSub(cat) { 
         document.getElementById('wish-main-cat').style.display = 'none'; document.getElementById('wish-sub-page').style.display = 'block';
         const c = document.getElementById('wish-items-container'); c.innerHTML = ""; const items = wishlistData[cat] || [];
