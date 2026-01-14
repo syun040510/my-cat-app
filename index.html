@@ -21,9 +21,7 @@
         .login-container { max-width: 400px; margin: 30px auto; padding: 20px; text-align: center; }
         .form-input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; margin-bottom: 15px; outline: none; }
         .primary-btn { width: 100%; padding: 14px; background: var(--main-blue); border: none; border-radius: 4px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .divider { border-top: 1px solid #eee; margin: 30px 0; position: relative; }
-        .divider::after { content: "或使用社交帳號登入"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 10px; font-size: 12px; color: #999; }
-        .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 25px; }
         .social-btn { padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; color: #555; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
         /* --- 日程管理介面 (日文) --- */
@@ -31,14 +29,13 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
         .btn-nav { background: var(--main-blue); border: none; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
         
-        /* 倒數提示區 */
         .notice-bar { background: #fff4e5; border: 1px solid #ffcc80; padding: 10px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; color: #e65100; display: none; }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: white; padding: 8px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .weekday { text-align: center; font-size: 12px; color: #999; font-weight: bold; }
         .day-cell { min-height: 95px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; }
         
-        /* 選定與框架優先權 */
+        /* 視覺高亮與框架 */
         .selected-day { border: 2.5px solid var(--main-blue) !important; background-color: var(--select-highlight) !important; z-index: 5; }
         .hi-red { border: 2.5px solid var(--s-red) !important; }
         .hi-rainbow { border: 2.5px solid transparent !important; background: linear-gradient(white, white) padding-box, linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) border-box !important; }
@@ -47,10 +44,11 @@
         .day-num { font-size: 14px; font-weight: bold; }
         .mood-j { font-size: 11px; color: var(--j-green); font-weight: bold; }
         .mood-s { font-size: 11px; color: var(--s-red); font-weight: bold; }
-        .star-green { color: var(--j-green); font-size: 18px; }
+        /* 星星顏色分開 */
+        .star-j { color: var(--j-green); font-size: 18px; }
+        .star-s { color: var(--s-red); font-size: 18px; }
         .anniv-icon { position: absolute; top: 4px; right: 4px; font-size: 12px; }
 
-        /* 詳細面板 */
         #details-panel { margin-top: 20px; background: white; border-radius: 25px; padding: 15px; box-shadow: 0 -5px 25px rgba(0,0,0,0.1); border-top: 6px solid var(--main-blue); }
         .task-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; background: #f9f9f9; padding: 10px; border-radius: 12px; position: relative; }
         .input-group { display: flex; gap: 8px; align-items: center; }
@@ -58,9 +56,8 @@
         .task-in { flex: 1; border: none; background: transparent; padding: 5px; font-size: 16px; outline: none; border-bottom: 1px solid #eee; }
         .phx-info { font-size: 12px; color: #0056b3; font-weight: bold; background: #e7f3ff; padding: 6px 10px; border-radius: 6px; display: inline-block; margin-top: 5px; }
         
-        /* 功能按鈕尺寸回復 */
         .btn-menu { display: flex; gap: 12px; margin: 20px 0; justify-content: center; }
-        .icon-btn { width: 50px; height: 50px; border-radius: 50%; border: 2.5px solid #eee; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #eee; cursor: pointer; transition: 0.2s; }
+        .icon-btn { width: 50px; height: 50px; border-radius: 50%; border: 2.5px solid #eee; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #eee; cursor: pointer; }
         .active-heart { color: #ff69b4; border-color: #ff69b4; background: #fff5f7; }
         .active-red { border-color: var(--s-red); color: var(--s-red); background: #fff0f0; }
         .active-rainbow { border: 2.5px solid orange !important; box-shadow: 0 0 5px orange; }
@@ -69,9 +66,8 @@
 
         .submit-btn { width: 100%; padding: 15px; background: var(--main-blue); border: none; border-radius: 12px; color: white; font-weight: bold; font-size: 16px; margin-top: 20px; cursor: pointer; }
         
-        /* 獨立功能頁面 */
+        /* 行きたいリスト (Wishlist) */
         .full-screen { display: none; position: fixed; inset: 0; background: #f0f7ff; z-index: 5000; overflow-y: auto; padding: 20px 10px; }
-        .wish-cat-card { background: white; padding: 18px; border-radius: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .wish-item { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
         .wish-input { width: 100%; padding: 10px; margin-bottom: 8px; border: 1px solid #eee; border-radius: 8px; box-sizing: border-box; }
     </style>
@@ -85,27 +81,18 @@
     </div>
     <div class="login-container">
         <div class="login-title">會員登入</div>
-        <div style="text-align:left; margin-bottom:15px;">
-            <label style="font-size:13px; color:#666;">電子郵件 / 帳號</label>
-            <input type="text" class="form-input" placeholder="example@mail.com">
-        </div>
-        <div style="text-align:left; margin-bottom:15px;">
-            <label style="font-size:13px; color:#666;">密碼</label>
-            <input type="password" id="pwd" class="form-input" placeholder="請輸入密碼">
-        </div>
+        <input type="text" class="form-input" placeholder="電子郵件 / 帳號">
+        <input type="password" id="pwd" class="form-input" placeholder="請輸入密碼">
         <button onclick="checkLogin()" class="primary-btn">確認登入</button>
-        <div class="divider"></div>
         <div class="social-grid">
             <div class="social-btn">f Facebook</div><div class="social-btn">G Google</div>
             <div class="social-btn">𝕏 Twitter</div><div class="social-btn"> Apple</div>
         </div>
-        <div style="font-size:11px; color:#ccc; margin-top:40px;">© 2026 JHSL Ticketing Service.</div>
     </div>
 </div>
 
 <div id="app">
     <div id="anniv-notice" class="notice-bar"></div>
-
     <div class="header">
         <button onclick="changeMonth(-1)" class="btn-nav">◀</button>
         <h2 id="month-display" style="font-size: 18px; margin:0; color:var(--main-blue);"></h2>
@@ -144,35 +131,26 @@
 </div>
 
 <div id="screen-wish" class="full-screen">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <h2 style="margin:0; color:var(--main-blue);">行きたいリスト</h2>
-        <button onclick="closeFull('wish')" style="border:none; background:none; font-size:24px;">✕</button>
-    </div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2>行きたいリスト</h2><button onclick="closeFull('wish')">✕</button></div>
     <div id="wish-main-cat">
-        <div class="wish-cat-card" onclick="showWishSub('food')"><h3>🍴 飲食店</h3><span>▶</span></div>
-        <div class="wish-cat-card" onclick="showWishSub('place')"><h3>📍 場所</h3><span>▶</span></div>
-        <div class="wish-cat-card" onclick="showWishSub('event')"><h3>🎟️ イベント</h3><span>▶</span></div>
-        <div class="wish-cat-card" onclick="showWishSub('plan')"><h3>📝 仮行程</h3><span>▶</span></div>
+        <div class="wish-item" onclick="showWishSub('food')">🍴 飲食店</div>
+        <div class="wish-item" onclick="showWishSub('place')">📍 場所</div>
+        <div class="wish-item" onclick="showWishSub('event')">🎟️ イベント</div>
+        <div class="wish-item" onclick="showWishSub('plan')">📝 仮行程</div>
     </div>
     <div id="wish-sub-page" style="display:none;">
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-            <button onclick="backToWishMain()">← 戻る</button>
-            <button id="add-wish-btn" style="background:var(--main-blue); color:white; border:none; padding:5px 12px; border-radius:8px;">+ 追加</button>
-        </div>
-        <div id="wish-items-container"></div>
+        <button onclick="backToWishMain()">← 戻る</button> <button id="add-wish-btn" style="float:right;">+ 追加</button>
+        <div id="wish-items-container" style="margin-top:20px;"></div>
         <button class="submit-btn" id="save-wish-btn">リストを保存</button>
     </div>
 </div>
 
 <div id="screen-event" class="full-screen">
-    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
-        <h2 style="margin:0; color:var(--main-blue);">重要日管理</h2>
-        <button onclick="closeFull('event')" style="border:none; background:none; font-size:24px;">✕</button>
-    </div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><h2>重要日管理</h2><button onclick="closeFull('event')">✕</button></div>
     <div style="background:white; padding:15px; border-radius:15px; margin-bottom:20px;">
         <input type="date" id="ev-date" class="form-input">
-        <input type="text" id="ev-name" class="form-input" placeholder="記念日・予約名">
-        <select id="ev-type" class="form-input"><option value="anniv">🎂 記念日</option><option value="ticket">🔔 予約/チケット</option></select>
+        <input type="text" id="ev-name" class="form-input" placeholder="記念日名稱">
+        <select id="ev-type" class="form-input"><option value="anniv">🎂 記念日</option><option value="ticket">🔔 預約</option></select>
         <button class="primary-btn" onclick="addEvent()">追加保存</button>
     </div>
     <div id="event-list-container"></div>
@@ -189,20 +167,8 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let curMonth = new Date(), selDate = "", cloudData = {}, eventData = {}, wishlistData = {};
-    let currentWishCat = "";
 
-    const regionOrder = {
-        "東京": 1, "東京都": 1, "北海道": 2, "青森": 3, "岩手": 4, "宮城": 5, "秋田": 6, "山形": 7, "福島": 8, "茨城": 9, "栃木": 10, "群馬": 11, "埼玉": 12, "千葉": 13, "神奈川": 14, "新潟": 15, "富山": 16, "石川": 17, "福井": 18, "山梨": 19, "長野": 20, "岐阜": 21, "静岡": 22, "愛知": 23, "三重": 24, "滋賀": 25, "京都": 26, "大阪": 27, "兵庫": 28, "奈良": 29, "和歌山": 30, "鳥取": 31, "島根": 32, "岡山": 33, "広島": 34, "山口": 35, "徳島": 36, "香川": 37, "愛媛": 38, "高知": 39, "福岡": 40, "佐賀": 41, "長崎": 42, "熊本": 43, "大分": 44, "宮崎": 45, "鹿児島": 46, "沖縄": 47,
-        "基隆": 101, "台北": 102, "新北": 103, "桃園": 104, "新竹": 105, "苗栗": 106, "台中": 107, "彰化": 108, "南投": 109, "雲林": 110, "嘉義": 111, "台南": 112, "高雄": 113, "屏東": 114, "宜蘭": 115, "花蓮": 116, "台東": 117, "澎湖": 118, "金門": 119, "馬祖": 120
-    };
-
-    function checkLogin() {
-        if (document.getElementById('pwd').value === '20190927') {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            startSync();
-        } else { alert('密碼錯誤'); }
-    }
+    function checkLogin() { if (document.getElementById('pwd').value === '20190927') { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app').style.display = 'block'; startSync(); } else { alert('密碼錯誤'); } }
 
     function startSync() {
         db.ref('calendar').on('value', snap => { cloudData = snap.val() || {}; render(); if(selDate) show(selDate, true); });
@@ -211,36 +177,36 @@
     }
 
     function render() {
-        const grid = document.getElementById('calendar-grid');
-        grid.innerHTML = ['日','月','火','水','木','金','土'].map(d => `<div class="weekday">${d}</div>`).join('');
-        const y = curMonth.getFullYear(), m = curMonth.getMonth();
-        document.getElementById('month-display').innerText = `${y}年 ${m + 1}月`;
+        const grid = document.getElementById('calendar-grid'); grid.innerHTML = ['日','月','火','水','木','金','土'].map(d => `<div class="weekday">${d}</div>`).join('');
+        const y = curMonth.getFullYear(), m = curMonth.getMonth(); document.getElementById('month-display').innerText = `${y}年 ${m + 1}月`;
         const first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
         for(let i=0; i<first; i++) grid.appendChild(document.createElement('div'));
         for(let d=1; d<=days; d++) {
-            const s = `${y}-${m+1}-${d}`;
-            const cell = document.createElement('div'); cell.className = 'day-cell';
+            const s = `${y}-${m+1}-${d}`; const cell = document.createElement('div'); cell.className = 'day-cell';
             if(s === selDate) cell.classList.add('selected-day');
             const dAt = cloudData[s] || {};
-            // 框架優先順位
             if(dAt.red) cell.classList.add('hi-red'); else if(dAt.rainbow) cell.classList.add('hi-rainbow'); else if(dAt.black) cell.classList.add('hi-black');
             
-            const ev = Object.values(eventData).find(e => e.date === s);
-            const jS = (dAt.j && dAt.j.length > 0) ? '<span class="star-green">★</span>' : '';
-            const sS = (dAt.s && dAt.s.length > 0) ? '<span class="star-green">★</span>' : '';
-            const moodDisplay = (dAt.moodJ || dAt.moodS) ? `<div><span class="mood-j">${dAt.moodJ||''}</span> <span class="mood-s">${dAt.moodS||''}</span></div>` : '';
+            const ev = Object.values(eventData).find(e => e.date.split('-')[1]==(m+1) && e.date.split('-')[2]==d);
+            // 星星顏色區分
+            const jS = (dAt.j || []).map(() => '<span class="star-j">★</span>').join('');
+            const sS = (dAt.s || []).map(() => '<span class="star-s">★</span>').join('');
             
-            cell.innerHTML = `
-                <div class="day-num">${d}</div>
-                ${ev ? `<span class="anniv-icon">${ev.type==='anniv'?'🎂':'🔔'}</span>` : ''}
-                <div style="display:flex; gap:2px;">${jS}${sS}</div>
-                ${moodDisplay}
-                <div>${dAt.business ? '💼' : ''}</div>
-                ${dAt.heart ? '<span class="heart-mark">💞</span>' : ''}
-            `;
-            cell.onclick = () => { selDate = s; render(); show(s); };
-            grid.appendChild(cell);
+            cell.innerHTML = `<div class="day-num">${d}</div>${ev?`<span class="anniv-icon">${ev.type==='anniv'?'🎂':'🔔'}</span>`:''}<div style="display:flex; flex-wrap:wrap; gap:1px;">${jS}${sS}</div><div><span class="mood-j">${dAt.moodJ||''}</span> <span class="mood-s">${dAt.moodS||''}</span></div><div>${dAt.business?'💼':''}</div>${dAt.heart?'<span class="heart-mark">💞</span>':''}`;
+            cell.onclick = () => { selDate = s; render(); show(s); }; grid.appendChild(cell);
         }
+    }
+
+    function updateNotice() {
+        const today = new Date().setHours(0,0,0,0); const nowYear = new Date().getFullYear();
+        const list = Object.values(eventData).map(e => {
+            const [_, m, d] = e.date.split('-').map(Number);
+            let target = new Date(nowYear, m - 1, d).getTime();
+            if (target < today) target = new Date(nowYear + 1, m - 1, d).getTime(); // 今年過了就算明年
+            return { ...e, diff: Math.ceil((target - today) / (1000*60*60*24)) };
+        }).sort((a,b) => a.diff - b.diff);
+        const bar = document.getElementById('anniv-notice');
+        if(list.length > 0) { bar.innerText = `🔔 次の予定: ${list[0].name} (あと ${list[0].diff} 日)`; bar.style.display = 'block'; }
     }
 
     function show(s, soft = false) {
@@ -250,109 +216,45 @@
         document.getElementById('date-label').innerText = `${y}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}(${dayJP})`;
         const dAt = cloudData[s] || {moodJ:"", moodS:"", memo:""};
         if(!soft) {
-            const rend = (id, list) => {
-                const c = document.getElementById(id); c.innerHTML = "";
-                (list || []).forEach(t => addRow(id.split('-')[0], t.time, t.text));
-                if(!list || list.length === 0) addRow(id.split('-')[0], "", "");
-            };
-            rend('j-tasks', dAt.j); rend('s-tasks', dAt.s);
-            document.getElementById('mood-j').value = dAt.moodJ || "";
-            document.getElementById('mood-s').value = dAt.moodS || "";
-            document.getElementById('memo-input').value = dAt.memo || "";
+            const rend = (id, list) => { const c = document.getElementById(id); c.innerHTML = ""; (list || []).forEach(t => addRow(id.split('-')[0], t.time, t.text)); if(!list || list.length === 0) addRow(id.split('-')[0], "", ""); };
+            rend('j-tasks', dAt.j); rend('s-tasks', dAt.s); document.getElementById('mood-j').value = dAt.moodJ || ""; document.getElementById('mood-s').value = dAt.moodS || ""; document.getElementById('memo-input').value = dAt.memo || "";
             const u = (id, a, c) => { const b = document.getElementById(id); if(a) b.classList.add(c); else b.classList.remove(c); };
             u('heart-btn', dAt.heart, 'active-heart'); u('red-btn', dAt.red, 'active-red'); u('rainbow-btn', dAt.rainbow, 'active-rainbow'); u('black-btn', dAt.black, 'active-black'); u('business-btn', dAt.business, 'active-business');
         }
     }
 
-    function getPHX(dateStr, timeStr) {
-        if(!timeStr) return "--";
-        const [y, m, d] = dateStr.split('-').map(Number);
-        const [hh, mm] = timeStr.split(':').map(Number);
-        const phx = new Date(new Date(y, m - 1, d, hh, mm).getTime() - (15 * 60 * 60 * 1000));
-        const pDay = ['日','月','火','水','木','金','土'][phx.getDay()];
-        return `PHX:${phx.getFullYear()}/${phx.getMonth()+1}/${phx.getDate()}(${pDay}) ${String(phx.getHours()).padStart(2,'0')}:00`;
-    }
-
     function addRow(type, time="", text="") {
         const div = document.createElement('div'); div.className = 'task-row';
-        div.innerHTML = `<div class="input-group"><input type="time" class="time-in t-time" value="${time}" oninput="this.parentElement.nextElementSibling.innerText=getPHX(selDate, this.value)"><input type="text" class="task-in t-text" value="${text}" placeholder="予定內容"></div><div class="phx-info">${getPHX(selDate, time)}</div><button onclick="this.parentElement.remove()" style="position:absolute; top:5px; right:5px; border:none; background:none; color:#ccc;">🗑️</button>`;
+        const getPHX = (t) => { if(!t) return "--"; const [hh,mm]=t.split(':'); const phx=new Date(new Date(selDate.replace(/-/g,'/')).setHours(hh,mm)).getTime()-(15*60*60*1000); const pD=new Date(phx); return `PHX:${pD.getFullYear()}/${pD.getMonth()+1}/${pD.getDate()}(${['日','月','火','水','木','金','土'][pD.getDay()]}) ${String(pD.getHours()).padStart(2,'0')}:00`; };
+        div.innerHTML = `<div class="input-group"><input type="time" class="time-in t-time" value="${time}" oninput="this.parentElement.nextElementSibling.innerText=getPHX(this.value)"><input type="text" class="task-in t-text" value="${text}" placeholder="內容"></div><div class="phx-info">${getPHX(time)}</div><button onclick="this.parentElement.remove()" style="position:absolute; top:5px; right:5px; border:none; background:none; color:#ccc;">🗑️</button>`;
         document.getElementById(type + '-tasks').appendChild(div);
     }
     function addRRow(type) { addRow(type, "", ""); }
 
     function save() {
         const getT = (id) => Array.from(document.getElementById(id).querySelectorAll('.task-row')).map(r => ({ time: r.querySelector('.t-time').value, text: r.querySelector('.t-text').value })).filter(t => t.time || t.text);
-        const dAt = {
-            j: getT('j-tasks'), s: getT('s-tasks'), moodJ: document.getElementById('mood-j').value, moodS: document.getElementById('mood-s').value,
-            red: document.getElementById('red-btn').classList.contains('active-red'), rainbow: document.getElementById('rainbow-btn').classList.contains('active-rainbow'), black: document.getElementById('black-btn').classList.contains('active-black'), business: document.getElementById('business-btn').classList.contains('active-business'), heart: document.getElementById('heart-btn').classList.contains('active-heart'), memo: document.getElementById('memo-input').value
-        };
+        const dAt = { j: getT('j-tasks'), s: getT('s-tasks'), moodJ: document.getElementById('mood-j').value, moodS: document.getElementById('mood-s').value, red: document.getElementById('red-btn').classList.contains('active-red'), rainbow: document.getElementById('rainbow-btn').classList.contains('active-rainbow'), black: document.getElementById('black-btn').classList.contains('active-black'), business: document.getElementById('business-btn').classList.contains('active-business'), heart: document.getElementById('heart-btn').classList.contains('active-heart'), memo: document.getElementById('memo-input').value };
         db.ref('calendar/' + selDate).set(dAt).then(() => alert("更新完了"));
     }
 
-    // --- 功能分頁管理 ---
-    function openFull(id) { document.getElementById('screen-' + id).style.display = 'block'; }
+    function openFull(id) { document.getElementById('screen-' + id).style.display = 'block'; if(id==='wish') showWishSub('food'); }
     function closeFull(id) { document.getElementById('screen-' + id).style.display = 'none'; }
-    
-    // --- 紀念日管理 ---
-    function updateNotice() {
-        const list = Object.values(eventData).map(e => {
-            const diff = Math.ceil((new Date(e.date.replace(/-/g, '/')) - new Date().setHours(0,0,0,0)) / (1000*60*60*24));
-            return { ...e, diff };
-        }).filter(e => e.diff >= 0).sort((a,b) => a.diff - b.diff);
-        const bar = document.getElementById('anniv-notice');
-        if(list.length > 0) {
-            bar.innerText = `🔔 次の予定: ${list[0].name} (あと ${list[0].diff} 日)`;
-            bar.style.display = 'block';
-        } else { bar.style.display = 'none'; }
-    }
-    function addEvent() {
-        const date = document.getElementById('ev-date').value, name = document.getElementById('ev-name').value, type = document.getElementById('ev-type').value;
-        if(!date || !name) return;
-        db.ref('events').push({ date: date.split('-').map(Number).join('-'), name, type });
-    }
-    function renderEventList() {
-        const container = document.getElementById('event-list-container'); container.innerHTML = "";
-        Object.entries(eventData).forEach(([id, ev]) => {
-            const div = document.createElement('div'); div.className = 'wish-item';
-            div.innerHTML = `<strong>${ev.type==='anniv'?'🎂':'🔔'} ${ev.name}</strong><br><small>${ev.date}</small><button onclick="db.ref('events/${id}').remove()" style="float:right; color:red;">削除</button>`;
-            container.appendChild(div);
-        });
-    }
+    function addEvent() { const date = document.getElementById('ev-date').value, name = document.getElementById('ev-name').value; if(!date||!name) return; db.ref('events').push({ date: date.split('-').map(Number).join('-'), name, type: document.getElementById('ev-type').value }); }
+    function renderEventList() { const c = document.getElementById('event-list-container'); c.innerHTML = ""; Object.entries(eventData).forEach(([id, ev]) => { const d = document.createElement('div'); d.className = 'wish-item'; d.innerHTML = `${ev.type==='anniv'?'🎂':'🔔'} ${ev.name} (${ev.date}) <button onclick="db.ref('events/${id}').remove()" style="float:right; color:red;">🗑️</button>`; c.appendChild(d); }); }
 
-    // --- 行きたいリスト (四大分頁核心) ---
-    function showWishSub(cat) {
-        currentWishCat = cat;
-        document.getElementById('wish-main-cat').style.display = 'none';
-        document.getElementById('wish-sub-page').style.display = 'block';
-        const container = document.getElementById('wish-items-container'); container.innerHTML = "";
-        const items = wishlistData[cat] || [];
-        // 排序
-        items.sort((a, b) => {
-            const orderA = regionOrder[Object.keys(regionOrder).find(k => a.area?.includes(k))] || 999;
-            const orderB = regionOrder[Object.keys(regionOrder).find(k => b.area?.includes(k))] || 999;
-            return orderA - orderB;
+    // --- Wishlist ---
+    function showWishSub(cat) { 
+        document.getElementById('wish-main-cat').style.display = 'none'; document.getElementById('wish-sub-page').style.display = 'block';
+        const c = document.getElementById('wish-items-container'); c.innerHTML = ""; const items = wishlistData[cat] || [];
+        items.forEach((item, idx) => {
+            const d = document.createElement('div'); d.className = 'wish-item';
+            if(cat==='food') d.innerHTML = `<input placeholder="地区" class="w-area wish-input" value="${item.area||''}"> <input placeholder="店名" class="w-name wish-input" value="${item.name||''}"> <select class="w-type wish-input"><option value="主食">主食</option><option value="咖啡廳">咖啡廳</option></select>`;
+            else d.innerHTML = `<textarea class="w-txt wish-input" placeholder="內容">${item.txt||''}</textarea>`;
+            d.innerHTML += `<button onclick="this.parentElement.remove()" style="float:right;">🗑️</button>`; c.appendChild(d);
         });
-        items.forEach((item, idx) => addWishUI(cat, item, idx));
-        document.getElementById('add-wish-btn').onclick = () => addWishUI(cat, {}, items.length);
-        document.getElementById('save-wish-btn').onclick = () => saveWishData(cat);
+        document.getElementById('save-wish-btn').onclick = () => { const its = Array.from(c.querySelectorAll('.wish-item')).map(div => { const o = {}; div.querySelectorAll('input, select, textarea').forEach(el => o[el.className.split('w-')[1].split(' ')[0]] = el.value); return o; }); db.ref('wishlist/'+cat).set(its).then(() => alert("保存完了")); };
     }
     function backToWishMain() { document.getElementById('wish-main-cat').style.display = 'block'; document.getElementById('wish-sub-page').style.display = 'none'; }
-    function addWishUI(cat, data, idx) {
-        const div = document.createElement('div'); div.className = 'wish-item';
-        if(cat==='food') div.innerHTML = `<input placeholder="地区" class="w-area wish-input" value="${data.area||''}"> <input placeholder="店名" class="w-name wish-input" value="${data.name||''}"> <select class="w-type wish-input"><option value="主食" ${data.type==='主食'?'selected':''}>主食</option><option value="カフェ" ${data.type==='カフェ'?'selected':''}>カフェ</option><option value="飲み" ${data.type==='飲み'?'selected':''}>飲み</option><option value="その他" ${data.type==='その他'?'selected':''}>その他</option></select> <input placeholder="看板商品" class="w-prod wish-input" value="${data.prod||''}"> <input placeholder="定休日" class="w-off wish-input" value="${data.off||''}">`;
-        else if(cat==='place') div.innerHTML = `<input placeholder="地区" class="w-area wish-input" value="${data.area||''}"> <input placeholder="場所名" class="w-name wish-input" value="${data.name||''}"> <input placeholder="特徴" class="w-feat wish-input" value="${data.feat||''}">`;
-        else if(cat==='event') div.innerHTML = `<input placeholder="地区" class="w-area wish-input" value="${data.area||''}"> <input placeholder="会場" class="w-name wish-input" value="${data.name||''}"> <select class="w-type wish-input"><option value="展示会" ${data.type==='展示会'?'selected':''}>展示会</option><option value="ライブ" ${data.type==='ライブ'?'selected':''}>ライブ</option><option value="その他" ${data.type==='その他'?'selected':''}>その他</option></select> <input placeholder="時間" class="w-time wish-input" value="${data.time||''}">`;
-        else div.innerHTML = `<textarea class="w-txt wish-input" style="height:80px;" placeholder="行程內容">${data.txt||''}</textarea>`;
-        div.innerHTML += `<button onclick="this.parentElement.remove()" style="color:#ccc; border:none; background:none; float:right;">🗑️</button>`;
-        document.getElementById('wish-items-container').appendChild(div);
-    }
-    function saveWishData(cat) {
-        const items = Array.from(document.getElementById('wish-items-container').querySelectorAll('.wish-item')).map(d => {
-            const obj = {}; d.querySelectorAll('input, select, textarea').forEach(el => obj[el.className.split('w-')[1].split(' ')[0]] = el.value);
-            return obj;
-        });
-        db.ref('wishlist/' + cat).set(items).then(() => alert("保存完了"));
-    }
     function changeMonth(n) { curMonth.setMonth(curMonth.getMonth() + n); render(); }
 </script>
 </body>
