@@ -29,13 +29,13 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin: 10px 0; }
         .btn-nav { background: var(--main-blue); border: none; color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; }
         
-        .notice-bar { background: #fff4e5; border: 1px solid #ffcc80; padding: 10px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; color: #e65100; display: none; }
+        /* 倒數提示區 (支持多行) */
+        .notice-bar { background: #fff4e5; border: 1px solid #ffcc80; padding: 10px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; color: #e65100; display: none; line-height: 1.5; }
 
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; background: white; padding: 8px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .weekday { text-align: center; font-size: 12px; color: #999; font-weight: bold; }
         .day-cell { min-height: 95px; border: 1px solid #fdf0e0; border-radius: 10px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; box-sizing: border-box; }
         
-        /* 視覺高亮與框架 */
         .selected-day { border: 2.5px solid var(--main-blue) !important; background-color: var(--select-highlight) !important; z-index: 5; }
         .hi-red { border: 2.5px solid var(--s-red) !important; }
         .hi-rainbow { border: 2.5px solid transparent !important; background: linear-gradient(white, white) padding-box, linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) border-box !important; }
@@ -44,7 +44,7 @@
         .day-num { font-size: 14px; font-weight: bold; }
         .mood-j { font-size: 11px; color: var(--j-green); font-weight: bold; }
         .mood-s { font-size: 11px; color: var(--s-red); font-weight: bold; }
-        /* 星星顏色分開 */
+        /* 星星樣式 */
         .star-j { color: var(--j-green); font-size: 18px; }
         .star-s { color: var(--s-red); font-size: 18px; }
         .anniv-icon { position: absolute; top: 4px; right: 4px; font-size: 12px; }
@@ -66,7 +66,6 @@
 
         .submit-btn { width: 100%; padding: 15px; background: var(--main-blue); border: none; border-radius: 12px; color: white; font-weight: bold; font-size: 16px; margin-top: 20px; cursor: pointer; }
         
-        /* 行きたいリスト (Wishlist) */
         .full-screen { display: none; position: fixed; inset: 0; background: #f0f7ff; z-index: 5000; overflow-y: auto; padding: 20px 10px; }
         .wish-item { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; position: relative; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
         .wish-input { width: 100%; padding: 10px; margin-bottom: 8px; border: 1px solid #eee; border-radius: 8px; box-sizing: border-box; }
@@ -81,7 +80,6 @@
     </div>
     <div class="login-container">
         <div class="login-title">會員登入</div>
-        <input type="text" class="form-input" placeholder="電子郵件 / 帳號">
         <input type="password" id="pwd" class="form-input" placeholder="請輸入密碼">
         <button onclick="checkLogin()" class="primary-btn">確認登入</button>
         <div class="social-grid">
@@ -93,6 +91,7 @@
 
 <div id="app">
     <div id="anniv-notice" class="notice-bar"></div>
+
     <div class="header">
         <button onclick="changeMonth(-1)" class="btn-nav">◀</button>
         <h2 id="month-display" style="font-size: 18px; margin:0; color:var(--main-blue);"></h2>
@@ -187,26 +186,43 @@
             const dAt = cloudData[s] || {};
             if(dAt.red) cell.classList.add('hi-red'); else if(dAt.rainbow) cell.classList.add('hi-rainbow'); else if(dAt.black) cell.classList.add('hi-black');
             
-            const ev = Object.values(eventData).find(e => e.date.split('-')[1]==(m+1) && e.date.split('-')[2]==d);
-            // 星星顏色區分
-            const jS = (dAt.j || []).map(() => '<span class="star-j">★</span>').join('');
-            const sS = (dAt.s || []).map(() => '<span class="star-s">★</span>').join('');
+            const ev = Object.values(eventData).find(e => {
+                const parts = e.date.split('-');
+                return parts[1] == (m+1) && parts[2] == d;
+            });
+
+            // 星星顯示邏輯更新：不論行程數，只顯示一個
+            const jS = (dAt.j && dAt.j.length > 0) ? '<span class="star-j">★</span>' : '';
+            const sS = (dAt.s && dAt.s.length > 0) ? '<span class="star-s">★</span>' : '';
             
-            cell.innerHTML = `<div class="day-num">${d}</div>${ev?`<span class="anniv-icon">${ev.type==='anniv'?'🎂':'🔔'}</span>`:''}<div style="display:flex; flex-wrap:wrap; gap:1px;">${jS}${sS}</div><div><span class="mood-j">${dAt.moodJ||''}</span> <span class="mood-s">${dAt.moodS||''}</span></div><div>${dAt.business?'💼':''}</div>${dAt.heart?'<span class="heart-mark">💞</span>':''}`;
+            cell.innerHTML = `
+                <div class="day-num">${d}</div>
+                ${ev?`<span class="anniv-icon">${ev.type==='anniv'?'🎂':'🔔'}</span>`:''}
+                <div style="display:flex; gap:2px;">${jS}${sS}</div>
+                <div><span class="mood-j">${dAt.moodJ||''}</span> <span class="mood-s">${dAt.moodS||''}</span></div>
+                <div>${dAt.business?'💼':''}</div>
+                ${dAt.heart?'<span class="heart-mark">💞</span>':''}`;
             cell.onclick = () => { selDate = s; render(); show(s); }; grid.appendChild(cell);
         }
     }
 
+    // 提醒列邏輯更新：顯示最近三個
     function updateNotice() {
         const today = new Date().setHours(0,0,0,0); const nowYear = new Date().getFullYear();
         const list = Object.values(eventData).map(e => {
-            const [_, m, d] = e.date.split('-').map(Number);
-            let target = new Date(nowYear, m - 1, d).getTime();
-            if (target < today) target = new Date(nowYear + 1, m - 1, d).getTime(); // 今年過了就算明年
+            const parts = e.date.split('-').map(Number);
+            let target = new Date(nowYear, parts[1] - 1, parts[2]).getTime();
+            if (target < today) target = new Date(nowYear + 1, parts[1] - 1, parts[2]).getTime();
             return { ...e, diff: Math.ceil((target - today) / (1000*60*60*24)) };
         }).sort((a,b) => a.diff - b.diff);
+
         const bar = document.getElementById('anniv-notice');
-        if(list.length > 0) { bar.innerText = `🔔 次の予定: ${list[0].name} (あと ${list[0].diff} 日)`; bar.style.display = 'block'; }
+        if(list.length > 0) {
+            // 取得前三個提醒
+            const topThree = list.slice(0, 3).map(e => `🔔 ${e.name} (あと ${e.diff} 日)`);
+            bar.innerHTML = topThree.join('<br>'); // 以換行分隔
+            bar.style.display = 'block';
+        } else { bar.style.display = 'none'; }
     }
 
     function show(s, soft = false) {
@@ -225,7 +241,7 @@
 
     function addRow(type, time="", text="") {
         const div = document.createElement('div'); div.className = 'task-row';
-        const getPHX = (t) => { if(!t) return "--"; const [hh,mm]=t.split(':'); const phx=new Date(new Date(selDate.replace(/-/g,'/')).setHours(hh,mm)).getTime()-(15*60*60*1000); const pD=new Date(phx); return `PHX:${pD.getFullYear()}/${pD.getMonth()+1}/${pD.getDate()}(${['日','月','火','水','木','金','土'][pD.getDay()]}) ${String(pD.getHours()).padStart(2,'0')}:00`; };
+        const getPHX = (t) => { if(!t) return "--"; const parts=t.split(':'); const phx=new Date(new Date(selDate.replace(/-/g,'/')).setHours(parts[0],parts[1])).getTime()-(15*60*60*1000); const pD=new Date(phx); return `PHX:${pD.getFullYear()}/${pD.getMonth()+1}/${pD.getDate()}(${['日','月','火','水','木','金','土'][pD.getDay()]}) ${String(pD.getHours()).padStart(2,'0')}:00`; };
         div.innerHTML = `<div class="input-group"><input type="time" class="time-in t-time" value="${time}" oninput="this.parentElement.nextElementSibling.innerText=getPHX(this.value)"><input type="text" class="task-in t-text" value="${text}" placeholder="內容"></div><div class="phx-info">${getPHX(time)}</div><button onclick="this.parentElement.remove()" style="position:absolute; top:5px; right:5px; border:none; background:none; color:#ccc;">🗑️</button>`;
         document.getElementById(type + '-tasks').appendChild(div);
     }
@@ -242,7 +258,6 @@
     function addEvent() { const date = document.getElementById('ev-date').value, name = document.getElementById('ev-name').value; if(!date||!name) return; db.ref('events').push({ date: date.split('-').map(Number).join('-'), name, type: document.getElementById('ev-type').value }); }
     function renderEventList() { const c = document.getElementById('event-list-container'); c.innerHTML = ""; Object.entries(eventData).forEach(([id, ev]) => { const d = document.createElement('div'); d.className = 'wish-item'; d.innerHTML = `${ev.type==='anniv'?'🎂':'🔔'} ${ev.name} (${ev.date}) <button onclick="db.ref('events/${id}').remove()" style="float:right; color:red;">🗑️</button>`; c.appendChild(d); }); }
 
-    // --- Wishlist ---
     function showWishSub(cat) { 
         document.getElementById('wish-main-cat').style.display = 'none'; document.getElementById('wish-sub-page').style.display = 'block';
         const c = document.getElementById('wish-items-container'); c.innerHTML = ""; const items = wishlistData[cat] || [];
