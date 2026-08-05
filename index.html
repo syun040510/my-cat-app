@@ -2,80 +2,233 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <title>JHSL 售票報名管理系統 - 會員中心</title>
     <link rel="icon" href="https://img.icons8.com/color/48/000000/ticket.png" type="image/x-icon">
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
-        :root { 
-            --main-blue: #0056b3; --gray: #6c757d; --bg: #f5f7f9; --s-red: #ff0000; --j-green: #008000; --c-purple: #8a2be2; --select-highlight: #e8f4ff;
-        }
-        * { box-sizing: border-box; }
-        body { font-family: -apple-system, "PingFang TC", "Microsoft JhengHei", sans-serif; margin: 0; background: var(--bg); color: #333; -webkit-tap-highlight-color: transparent; }
+        :root {
+            --bg: #f2f4f7;
+            --card: #ffffff;
+            --line: #e6e9ee;
+            --line-soft: #f0f2f5;
+            --text: #1c1f25;
+            --muted: #8b93a1;
+            --faint: #c8cdd6;
 
-        /* --- 登入介面 --- */
-        #login-screen { position: fixed; inset: 0; background: #fff; z-index: 10000; overflow-y: auto; }
-        .nav-bar { background: #fff; border-bottom: 2px solid var(--main-blue); padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; }
-        .logo { color: var(--main-blue); font-size: 16px; font-weight: 900; text-decoration: none; white-space: nowrap; }
-        .nav-links { font-size: 11px; color: var(--gray); display: flex; gap: 8px; flex-shrink: 0; }
+            --accent: #1f6feb;
+            --j: #2e8b57;
+            --s: #d94848;
+            --c: #7a5af5;
+            --heart: #e8608f;
+            --racing: #d97316;
+            --warn: #c2410c;
+
+            --j-soft: #eaf5ee;
+            --s-soft: #fdeded;
+            --c-soft: #f1edff;
+            --accent-soft: #e9f1fe;
+
+            --radius: 12px;
+            --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.05);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0e1014;
+                --card: #171a20;
+                --line: #272c35;
+                --line-soft: #1f232b;
+                --text: #e7e9ee;
+                --muted: #8b93a1;
+                --faint: #4a515d;
+
+                --accent: #4c8dff;
+                --j: #4cc38a;
+                --s: #f0736a;
+                --c: #9d86ff;
+                --heart: #f57fa8;
+                --racing: #f0913f;
+                --warn: #f0913f;
+
+                --j-soft: #16261d;
+                --s-soft: #2a1919;
+                --c-soft: #1e1a2e;
+                --accent-soft: #14213a;
+
+                --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
+            }
+        }
+
+        * { box-sizing: border-box; }
+        html { -webkit-text-size-adjust: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang TC", "Hiragino Sans", sans-serif;
+            margin: 0; background: var(--bg); color: var(--text);
+            -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased;
+            font-feature-settings: "tnum" 1;
+        }
+        button, input, select, textarea { font-family: inherit; color: var(--text); }
+        input, select, textarea { font-size: 16px; }
+
+        /* ================= 登入介面（維持原樣式） ================= */
+        #login-screen { position: fixed; inset: 0; background: #fff; color: #333; z-index: 10000; overflow-y: auto; }
+        .nav-bar { background: #fff; border-bottom: 2px solid #0056b3; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
+        .logo { color: #0056b3; font-size: 16px; font-weight: 900; text-decoration: none; white-space: nowrap; }
+        .nav-links { font-size: 11px; color: #6c757d; display: flex; gap: 8px; flex-shrink: 0; }
         .login-container { max-width: 380px; margin: 20px auto; padding: 20px; text-align: center; }
         .login-title { font-size: 20px; font-weight: bold; margin-bottom: 25px; color: #333; }
-        .field-label { display: block; text-align: left; font-size: 13px; color: #666; margin-bottom: 5px; margin-left: 2px; }
-        .form-input { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; margin-bottom: 20px; outline: none; background: #fafafa; }
-        .primary-btn { width: 100%; padding: 15px; background: var(--main-blue); border: none; border-radius: 6px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
+        #login-screen .field-label { display: block; text-align: left; font-size: 13px; color: #666; margin-bottom: 5px; margin-left: 2px; }
+        #login-screen .form-input { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; margin-bottom: 20px; outline: none; background: #fafafa; color: #333; }
+        #login-screen .primary-btn { width: 100%; padding: 15px; background: #0056b3; border: none; border-radius: 6px; color: #fff; font-size: 16px; font-weight: bold; }
         .divider { border-top: 1px solid #eee; margin: 30px 0; position: relative; }
         .divider::after { content: "快速登入 / 驗證"; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #fff; padding: 0 10px; font-size: 12px; color: #999; }
         .social-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .social-btn { padding: 10px; border: 1px solid #eee; border-radius: 6px; font-size: 12px; color: #555; display: flex; align-items: center; justify-content: center; gap: 5px; background: #fff; }
 
-        /* --- 主程式介面 --- */
-        #app { display: none; padding: 10px; max-width: 500px; margin: auto; padding-bottom: 60px; background: #fff; min-height: 100vh; }
-        .notice-bar { background: #fff8e1; border-left: 4px solid #ffc107; padding: 12px; border-radius: 8px; margin-bottom: 12px; font-size: 13px; color: #5d4037; display: none; line-height: 1.6; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .header { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; }
-        .month-label { font-size: 18px; font-weight: 800; color: var(--main-blue); margin: 0; }
-        .btn-nav { background: var(--main-blue); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        /* ================= 主程式 ================= */
+        #app { display: none; padding: 12px 12px calc(90px + env(safe-area-inset-bottom)); max-width: 500px; margin: auto; min-height: 100vh; }
 
-        /* 月曆格子 */
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; background: #fff; border-radius: 12px; }
-        .weekday { text-align: center; font-size: 11px; color: #bbb; font-weight: bold; padding-bottom: 5px; }
-        .day-cell { min-height: 85px; border: 1px solid #eee; border-radius: 8px; position: relative; padding: 4px; background: #fff; display: flex; flex-direction: column; cursor: pointer; transition: 0.1s; }
-        .selected-day { border: 2px solid var(--main-blue) !important; background-color: var(--select-highlight) !important; z-index: 5; }
-        .hi-red { border: 2px solid var(--s-red) !important; }
-        .hi-rainbow { border: 2px solid transparent !important; background: linear-gradient(white, white) padding-box, linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet) border-box !important; }
-        .hi-black { border: 2px solid #000 !important; }
+        .notice-bar { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.75; display: none; box-shadow: var(--shadow); }
+        .notice-row { display: flex; align-items: center; gap: 8px; }
+        .notice-row + .notice-row { margin-top: 4px; }
+        .notice-pill-ok { color: var(--j); font-weight: 600; }
+        .notice-pill-warn { color: var(--warn); font-weight: 700; }
+        .notice-ev { color: var(--muted); }
+        .notice-ev b { color: var(--text); font-weight: 600; }
 
-        .day-num { font-size: 13px; font-weight: bold; margin-bottom: 4px; }
-        .star-j { color: var(--j-green); font-size: 16px; }
-        .star-s { color: var(--s-red); font-size: 16px; }
-        .common-icon { font-size: 14px; margin-left: 2px; }
-        .mood-box { display: flex; flex-direction: column; line-height: 1; margin-top: 2px; }
-        .mood-j { font-size: 10px; color: var(--j-green); font-weight: bold; }
-        .mood-s { font-size: 10px; color: var(--s-red); font-weight: bold; }
-        .anniv-icon { position: absolute; top: 4px; right: 4px; font-size: 12px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 16px; }
+        .month-label { font-size: 21px; font-weight: 800; letter-spacing: -0.4px; margin: 0; }
+        .month-label small { font-size: 13px; font-weight: 600; color: var(--muted); margin-right: 6px; }
+        .btn-nav { background: var(--card); border: 1px solid var(--line); color: var(--muted); width: 34px; height: 34px; border-radius: 50%; font-size: 13px; display: flex; align-items: center; justify-content: center; }
+        .btn-nav:active { background: var(--accent-soft); color: var(--accent); }
 
-        /* 詳細面板 */
-        #details-panel { margin-top: 20px; background: white; border-radius: 20px; padding: 20px 15px; border: 1px solid #eee; box-shadow: 0 -10px 30px rgba(0,0,0,0.03); }
-        .date-title { text-align: center; font-size: 18px; font-weight: 800; color: #444; margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; }
-        .task-row { background: #f8fafc; padding: 12px; border-radius: 10px; margin-bottom: 10px; position: relative; border-left: 4px solid #ddd; }
-        .input-group { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
-        .time-in { border: 1px solid #ced4da; border-radius: 6px; padding: 8px; width: 105px; font-size: 16px; background: #fff; }
-        .task-in { flex: 1; border: none; background: transparent; padding: 8px 4px; font-size: 16px; outline: none; border-bottom: 2px solid #e9ecef; }
-        .phx-info { font-size: 12px; color: var(--main-blue); font-weight: 600; background: #eef6ff; padding: 5px 10px; border-radius: 4px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-        
-        /* 狀態按鈕 */
-        .btn-menu { display: flex; gap: 10px; margin: 25px 0; justify-content: center; flex-wrap: wrap; }
-        .icon-btn { width: 52px; height: 52px; border-radius: 50%; border: 2px solid #eee; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; }
-        .active-heart { color: #ff69b4; border-color: #ff69b4; background: #fff5f7; }
-        .active-red { border-color: var(--s-red); color: var(--s-red); background: #fff0f0; }
-        .active-rainbow { border-color: orange !important; box-shadow: 0 0 8px rgba(255,165,0,0.3); }
-        .active-black { border-color: #000; color: #000; background: #eee; }
-        .active-business { border-color: #333; color: #333; background: #f0f0f0; }
+        /* ---- 月曆 ---- */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .weekday { text-align: center; font-size: 11px; color: var(--muted); font-weight: 600; padding-bottom: 6px; }
+        .weekday.wk-sun { color: var(--s); }
+        .weekday.wk-sat { color: var(--accent); }
 
-        .submit-btn { width: 100%; padding: 18px; background: var(--main-blue); border: none; border-radius: 10px; color: white; font-weight: bold; font-size: 17px; margin-top: 20px; }
-        
-        .full-screen { display: none; position: fixed; inset: 0; background: #fff; z-index: 5000; overflow-y: auto; padding: 20px 15px; }
-        .event-card { background: #f8fafc; border-radius: 12px; padding: 15px; margin-bottom: 12px; position: relative; border-left: 4px solid var(--main-blue); }
+        .day-cell {
+            min-height: 78px; border: 1px solid var(--line); border-radius: 10px;
+            position: relative; padding: 5px 5px 4px; background: var(--card);
+            display: flex; flex-direction: column; overflow: hidden;
+            transition: box-shadow .12s ease;
+        }
+        /* 狀態邊框：與「選取」互不干擾 */
+        .hi-red { border: 1.5px solid var(--s); }
+        .hi-black { border: 1.5px solid var(--text); }
+        .hi-rainbow { border: 1.5px solid transparent; background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(115deg, #ff5f6d, #ffc371, #4ade80, #38bdf8, #a78bfa) border-box; }
+        /* 選取：外圈光環 + 內層淡色覆蓋（彩虹格也不會破圖） */
+        .selected-day { box-shadow: 0 0 0 2.5px var(--accent), inset 0 0 0 999px var(--accent-soft); }
+
+        .day-head { display: flex; align-items: center; justify-content: space-between; height: 20px; }
+        .day-num { font-size: 13px; font-weight: 700; color: var(--text); }
+        .day-cell.is-sun .day-num { color: var(--s); }
+        .day-cell.is-sat .day-num { color: var(--accent); }
+        .day-cell.is-today .day-num { background: var(--accent); color: #fff; width: 21px; height: 21px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .ev-dot { font-size: 11px; line-height: 1; }
+
+        .bars { margin-top: 4px; display: flex; flex-direction: column; gap: 2px; }
+        .bar { height: 3px; border-radius: 2px; }
+        .bar-j { background: var(--j); }
+        .bar-c { background: var(--c); }
+        .bar-s { background: var(--s); }
+
+        .mood-row { margin-top: 3px; display: flex; gap: 4px; font-size: 9.5px; font-weight: 700; line-height: 1; }
+        .mood-j { color: var(--j); }
+        .mood-s { color: var(--s); }
+
+        .cell-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 2px; }
+        .foot-icons { display: flex; gap: 1px; font-size: 11px; line-height: 1; }
+        .pill-num { font-size: 10px; color: var(--faint); font-weight: 600; }
+        .pill-ok { font-size: 11px; color: var(--j); font-weight: 900; }
+
+        /* ---- 詳細面板 ---- */
+        #details-panel { margin-top: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 15px; box-shadow: var(--shadow); }
+        .date-title { text-align: center; font-size: 17px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line-soft); }
+
+        .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .sec-head + .sec-head, .task-list + .sec-head { margin-top: 18px; }
+        .sec-tag { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 7px; font-size: 12px; font-weight: 900; color: #fff; }
+        .tag-j { background: var(--j); }
+        .tag-c { background: var(--c); }
+        .tag-s { background: var(--s); }
+        .sec-left { display: flex; align-items: center; gap: 8px; }
+        .mood-sel { border: 1px solid var(--line); background: var(--card); border-radius: 7px; padding: 4px 6px; font-size: 13px; }
+        .sec-note { font-size: 12px; color: var(--muted); }
+        .btn-add { font-size: 11.5px; font-weight: 600; color: var(--muted); background: var(--card); border: 1px solid var(--line); padding: 6px 10px; border-radius: 8px; }
+        .btn-add:active { border-color: var(--accent); color: var(--accent); }
+
+        .task-row { background: var(--line-soft); padding: 11px 12px; border-radius: 10px; margin-bottom: 8px; position: relative; border-left: 3px solid var(--faint); }
+        .task-row.row-j { border-left-color: var(--j); }
+        .task-row.row-c { border-left-color: var(--c); }
+        .task-row.row-s { border-left-color: var(--s); }
+        .input-group { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+        .time-in { border: 1px solid var(--line); border-radius: 7px; padding: 7px; width: 104px; background: var(--card); }
+        .task-in { flex: 1; border: none; background: transparent; padding: 7px 2px; outline: none; border-bottom: 1.5px solid var(--line); }
+        .phx-info { font-size: 11.5px; color: var(--accent); font-weight: 600; background: var(--accent-soft); padding: 4px 9px; border-radius: 5px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .btn-del { position: absolute; top: 6px; right: 6px; border: none; background: none; color: var(--faint); font-size: 15px; padding: 4px; }
+
+        /* ---- 服藥區 ---- */
+        .pill-box { background: var(--j-soft); border: 1px solid transparent; border-radius: 12px; padding: 13px 14px; margin: 12px 0 4px; }
+        .pill-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .pill-title { font-size: 13px; font-weight: 800; color: var(--j); }
+        .pill-count { font-size: 13px; color: var(--text); margin-left: 7px; font-weight: 600; }
+        .pill-toggle { border: 1.5px solid var(--faint); background: var(--card); color: var(--muted); font-size: 13px; font-weight: 700; padding: 9px 15px; border-radius: 20px; white-space: nowrap; }
+        .pill-toggle.taken { border-color: var(--j); color: #fff; background: var(--j); }
+        .pill-reset { font-size: 11px; color: var(--muted); background: none; border: 1px solid var(--line); padding: 5px 9px; border-radius: 7px; }
+
+        /* ---- 狀態按鈕 ---- */
+        .btn-menu { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; margin: 22px 0 18px; }
+        .icon-btn { aspect-ratio: 1; border-radius: 14px; border: 1.5px solid var(--line); background: var(--card); display: flex; align-items: center; justify-content: center; font-size: 19px; }
+        .active-heart { border-color: var(--heart); background: var(--s-soft); }
+        .active-red { border-color: var(--s); color: var(--s); background: var(--s-soft); }
+        .active-rainbow { border-color: transparent; background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(115deg, #ff5f6d, #ffc371, #4ade80, #38bdf8, #a78bfa) border-box; }
+        .active-black { border-color: var(--text); color: var(--text); background: var(--line-soft); }
+        .active-business { border-color: var(--muted); background: var(--line-soft); }
+        .active-racing { border-color: var(--racing); background: var(--s-soft); }
+
+        .memo-in { width: 100%; min-height: 84px; border: 1px solid var(--line); border-radius: 12px; padding: 12px; background: var(--line-soft); font-size: 15px; outline: none; resize: vertical; }
+        .submit-btn { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; margin-top: 14px; }
+        .link-btn { display: block; width: 100%; text-align: center; font-size: 13px; color: var(--muted); background: none; border: none; margin-top: 20px; font-weight: 600; }
+
+        /* ---- 今日按鈕 ---- */
+        #today-btn {
+            position: fixed; left: 50%; transform: translateX(-50%);
+            bottom: calc(18px + env(safe-area-inset-bottom));
+            background: var(--text); color: var(--bg); border: none;
+            padding: 11px 22px; border-radius: 22px; font-size: 13px; font-weight: 700;
+            box-shadow: 0 4px 18px rgba(0,0,0,.22); z-index: 900; display: none;
+        }
+
+        /* ---- Toast ---- */
+        #toast {
+            position: fixed; left: 50%; transform: translate(-50%, 20px);
+            bottom: calc(72px + env(safe-area-inset-bottom));
+            background: rgba(28,31,37,.94); color: #fff; padding: 11px 20px;
+            border-radius: 12px; font-size: 13.5px; font-weight: 600;
+            opacity: 0; pointer-events: none; transition: .22s ease; z-index: 9000;
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+        }
+        #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+        /* ---- 全螢幕 ---- */
+        .full-screen { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; overflow-y: auto; padding: calc(20px + env(safe-area-inset-top)) 15px calc(30px + env(safe-area-inset-bottom)); }
+        .fs-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+        .fs-title { margin: 0; font-size: 20px; font-weight: 800; }
+        .fs-close { border: none; background: var(--card); border: 1px solid var(--line); width: 34px; height: 34px; border-radius: 50%; font-size: 16px; color: var(--muted); }
+        .panel { background: var(--card); border: 1px solid var(--line); padding: 18px; border-radius: 16px; margin-bottom: 22px; box-shadow: var(--shadow); }
+        .field-label { display: block; text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; margin: 0 0 6px 2px; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 9px; margin-bottom: 16px; outline: none; background: var(--line-soft); }
+        .primary-btn { width: 100%; padding: 14px; background: var(--accent); border: none; border-radius: 10px; color: #fff; font-size: 15px; font-weight: 700; }
+        .event-card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 10px; position: relative; }
+        .event-card strong { font-size: 15px; }
+        .event-card small { color: var(--muted); font-size: 12px; }
+        .btn-remove { position: absolute; bottom: 12px; right: 12px; border: 1px solid var(--line); background: none; color: var(--s); font-size: 12px; font-weight: 700; padding: 5px 10px; border-radius: 7px; }
     </style>
 </head>
 <body>
@@ -97,7 +250,7 @@
         <div class="divider"></div>
         <div class="social-grid">
             <div class="social-btn">f Facebook</div><div class="social-btn">G Google</div>
-            <div class="social-btn">𝕏 Twitter</div><div class="social-btn"> Apple</div>
+            <div class="social-btn">𝕏 Twitter</div><div class="social-btn"> Apple</div>
         </div>
     </div>
 </div>
@@ -110,106 +263,187 @@
         <h3 id="month-display" class="month-label"></h3>
         <button onclick="changeMonth(1)" class="btn-nav">▶</button>
     </div>
-    
+
     <div class="calendar-grid" id="calendar-grid"></div>
 
     <div id="details-panel" style="display:none;">
         <div id="date-label" class="date-title"></div>
-        
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <div><span style="color:var(--j-green); font-weight:900;">J</span><select id="mood-j" style="margin-left:8px; border-radius:5px;"><option value="">-</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-            <button onclick="addRRow('j')" style="font-size:11px; color:var(--main-blue); background:none; border:1px solid #ddd; padding:4px 8px; border-radius:5px;">+ 予定追加</button>
-        </div>
-        <div id="j-tasks"></div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 12px;">
-            <div><span style="color:var(--c-purple); font-weight:900;">C</span><span style="font-size:12px; color:var(--gray); margin-left:5px;">共通</span></div>
-            <button onclick="addRRow('c')" style="font-size:11px; color:var(--c-purple); background:none; border:1px solid var(--c-purple); padding:4px 8px; border-radius:5px;">+ 共通予定追加</button>
+        <div class="sec-head">
+            <div class="sec-left">
+                <span class="sec-tag tag-j">J</span>
+                <select id="mood-j" class="mood-sel"><option value="">気分 -</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+            </div>
+            <button class="btn-add" onclick="addRRow('j')">＋ 予定</button>
         </div>
-        <div id="c-tasks"></div>
-        
-        <div style="display:flex; justify-content:space-between; align-items:center; margin:20px 0 12px;">
-            <div><span style="color:var(--s-red); font-weight:900;">S</span><select id="mood-s" style="margin-left:8px; border-radius:5px;"><option value="">-</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select></div>
-            <button onclick="addRRow('s')" style="font-size:11px; color:var(--main-blue); background:none; border:1px solid #ddd; padding:4px 8px; border-radius:5px;">+ 予定追加</button>
+        <div id="j-tasks" class="task-list"></div>
+
+        <!-- 事前避孕藥（悅姿 28錠 / J） -->
+        <div class="pill-box">
+            <div class="pill-head">
+                <div>
+                    <span class="pill-title">💊 ヤーズ</span>
+                    <span id="pill-count" class="pill-count"></span>
+                </div>
+                <button id="pill-btn" class="pill-toggle" onclick="togglePill()">未服用</button>
+            </div>
+            <div style="margin-top:10px; text-align:right;">
+                <button class="pill-reset" onclick="startPack()">この日を 1 錠目にする</button>
+            </div>
         </div>
-        <div id="s-tasks"></div>
+
+        <div class="sec-head">
+            <div class="sec-left">
+                <span class="sec-tag tag-c">C</span>
+                <span class="sec-note">共通</span>
+            </div>
+            <button class="btn-add" onclick="addRRow('c')">＋ 共通予定</button>
+        </div>
+        <div id="c-tasks" class="task-list"></div>
+
+        <div class="sec-head">
+            <div class="sec-left">
+                <span class="sec-tag tag-s">S</span>
+                <select id="mood-s" class="mood-sel"><option value="">気分 -</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
+            </div>
+            <button class="btn-add" onclick="addRRow('s')">＋ 予定</button>
+        </div>
+        <div id="s-tasks" class="task-list"></div>
 
         <div class="btn-menu">
             <button class="icon-btn" id="heart-btn" onclick="this.classList.toggle('active-heart')">💞</button>
-            <button class="icon-btn" id="red-btn" onclick="this.classList.toggle('active-red')">□</button>
+            <button class="icon-btn" id="red-btn" onclick="this.classList.toggle('active-red')">🟥</button>
             <button class="icon-btn" id="rainbow-btn" onclick="this.classList.toggle('active-rainbow')">✈️</button>
-            <button class="icon-btn" id="black-btn" onclick="this.classList.toggle('active-black')">■</button>
+            <button class="icon-btn" id="black-btn" onclick="this.classList.toggle('active-black')">⬛</button>
             <button class="icon-btn" id="business-btn" onclick="this.classList.toggle('active-business')">💼</button>
+            <button class="icon-btn" id="racing-btn" onclick="this.classList.toggle('active-racing')">🏎️</button>
         </div>
 
-        <textarea id="memo-input" style="width:100%; min-height:90px; border:1px solid #ddd; border-radius:10px; padding:12px; box-sizing:border-box; font-size:15px; background:#fafafa;" placeholder="📝 備考..."></textarea>
-        <button class="submit-btn" onclick="save()">日程更新</button>
-        <div onclick="openFull('event')" style="text-align:center; font-size:13px; color:var(--main-blue); margin-top:25px; text-decoration:underline; font-weight:bold;">🎫 重要予約・記念日管理</div>
+        <textarea id="memo-input" class="memo-in" placeholder="📝 備考..."></textarea>
+        <button class="submit-btn" onclick="save()">日程を更新</button>
+        <button class="link-btn" onclick="openFull('event')">🎫 重要予約・記念日の管理</button>
     </div>
 </div>
 
+<button id="today-btn" onclick="goToday()">今日へ</button>
+<div id="toast"></div>
+
 <div id="screen-event" class="full-screen">
-    <div style="display:flex; justify-content:space-between; margin-bottom:25px;">
-        <h2 style="margin:0; font-size:20px; color:var(--main-blue);">重要日管理</h2>
-        <button onclick="closeFull('event')" style="border:none; background:none; font-size:26px;">✕</button>
+    <div class="fs-head">
+        <h2 class="fs-title">重要日の管理</h2>
+        <button class="fs-close" onclick="closeFull('event')">✕</button>
     </div>
-    <div style="background:#f0f4f8; padding:20px; border-radius:15px; margin-bottom:25px;">
+    <div class="panel">
         <label class="field-label">日付</label>
         <input type="date" id="ev-date" class="form-input">
         <label class="field-label">項目名</label>
         <input type="text" id="ev-name" class="form-input" placeholder="例：記念日、予約日">
         <label class="field-label">カテゴリー</label>
-        <select id="ev-type" class="form-input"><option value="anniv">🎂 記念日</option><option value="ticket">🔔 予約/チケット</option></select>
+        <select id="ev-type" class="form-input"><option value="anniv">🎂 記念日</option><option value="ticket">🔔 予約 / チケット</option></select>
         <button class="primary-btn" onclick="addEvent()">保存する</button>
     </div>
     <div id="event-list-container"></div>
 </div>
 
 <script>
-    const firebaseConfig = { 
-        apiKey: "AIzaSyA6AW2Lt_SuxNTeEBe6ZUAtSvkpVT96PAM", 
-        authDomain: "sjcalender-78d2a.firebaseapp.com", 
-        databaseURL: "https://sjcalender-78d2a-default-rtdb.firebaseio.com", 
-        projectId: "sjcalender-78d2a", 
-        appId: "1:658651415692:web:3cf9aac6840eebc6e027a9" 
+    const firebaseConfig = {
+        apiKey: "AIzaSyA6AW2Lt_SuxNTeEBe6ZUAtSvkpVT96PAM",
+        authDomain: "sjcalender-78d2a.firebaseapp.com",
+        databaseURL: "https://sjcalender-78d2a-default-rtdb.firebaseio.com",
+        projectId: "sjcalender-78d2a",
+        appId: "1:658651415692:web:3cf9aac6840eebc6e027a9"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    let curMonth = new Date(), selDate = "", cloudData = {}, eventData = {};
+    let curMonth = new Date(), selDate = "", cloudData = {}, eventData = {}, pillStart = "";
+    const PACK_SIZE = 28;
+    const WD = ['日','月','火','水','木','金','土'];
 
-    function checkLogin() { if (document.getElementById('pwd').value === '20190927') { document.getElementById('login-screen').style.display = 'none'; document.getElementById('app').style.display = 'block'; startSync(); } else { alert('帳號或密碼錯誤'); } }
-    
-    function startSync() {
-        db.ref('calendar').on('value', snap => { cloudData = snap.val() || {}; render(); if(selDate) show(selDate, true); });
-        db.ref('events').on('value', snap => { eventData = snap.val() || {}; updateNotice(); render(); renderEventList(); });
+    function toast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg; t.classList.add('show');
+        clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 1800);
     }
 
+    function checkLogin() {
+        if (document.getElementById('pwd').value === '20190927') {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            document.getElementById('today-btn').style.display = 'block';
+            startSync();
+        } else { alert('帳號或密碼錯誤'); }
+    }
+
+    function startSync() {
+        db.ref('calendar').on('value', snap => { cloudData = snap.val() || {}; render(); updateNotice(); if(selDate) show(selDate, true); });
+        db.ref('events').on('value', snap => { eventData = snap.val() || {}; updateNotice(); render(); renderEventList(); });
+        db.ref('pill').on('value', snap => { pillStart = (snap.val() || {}).start || ""; render(); updateNotice(); if(selDate) renderPill(selDate); });
+    }
+
+    /* ---------- 服藥計算 ---------- */
+    function toDate(key) { const p = key.split('-').map(Number); return new Date(p[0], p[1]-1, p[2]); }
+    function todayKey() { const t = new Date(); return `${t.getFullYear()}-${t.getMonth()+1}-${t.getDate()}`; }
+    function pillNo(key) {
+        if(!pillStart) return 0;
+        const diff = Math.round((toDate(key) - toDate(pillStart)) / 86400000);
+        return (diff >= 0 && diff < PACK_SIZE) ? diff + 1 : 0;
+    }
+
+    /* ---------- 月曆 ---------- */
     function render() {
-        const grid = document.getElementById('calendar-grid'); grid.innerHTML = ['日','月','火','水','木','金','土'].map(d => `<div class="weekday">${d}</div>`).join('');
-        const y = curMonth.getFullYear(), m = curMonth.getMonth(); document.getElementById('month-display').innerText = `${y}年 ${m + 1}月`;
+        const grid = document.getElementById('calendar-grid');
+        grid.innerHTML = WD.map((d, i) => `<div class="weekday ${i===0?'wk-sun':''} ${i===6?'wk-sat':''}">${d}</div>`).join('');
+        const y = curMonth.getFullYear(), m = curMonth.getMonth();
+        document.getElementById('month-display').innerHTML = `<small>${y}</small>${m + 1}月`;
         const first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
+        const tk = todayKey();
         for(let i=0; i<first; i++) grid.appendChild(document.createElement('div'));
+
         for(let d=1; d<=days; d++) {
-            const s = `${y}-${m+1}-${d}`; const cell = document.createElement('div'); cell.className = 'day-cell';
-            if(s === selDate) cell.classList.add('selected-day');
+            const s = `${y}-${m+1}-${d}`;
+            const cell = document.createElement('div');
+            cell.className = 'day-cell';
+            const wd = new Date(y, m, d).getDay();
+            if(wd === 0) cell.classList.add('is-sun');
+            if(wd === 6) cell.classList.add('is-sat');
+            if(s === tk) cell.classList.add('is-today');
+
             const dAt = cloudData[s] || {};
-            if(dAt.red) cell.classList.add('hi-red'); else if(dAt.rainbow) cell.classList.add('hi-rainbow'); else if(dAt.black) cell.classList.add('hi-black');
+            if(dAt.red) cell.classList.add('hi-red');
+            else if(dAt.rainbow) cell.classList.add('hi-rainbow');
+            else if(dAt.black) cell.classList.add('hi-black');
+            if(s === selDate) cell.classList.add('selected-day');
+
             const ev = Object.values(eventData).find(e => { const p = e.date.split('-'); return p[1] == (m+1) && p[2] == d; });
-            
-            // 星星與共通符號顯示
-            const jS = (dAt.j && dAt.j.length > 0) ? '<span class="star-j">★</span>' : '';
-            const sS = (dAt.s && dAt.s.length > 0) ? '<span class="star-s">★</span>' : '';
-            const cS = (dAt.c && dAt.c.length > 0) ? '<span class="common-icon">👩‍❤️‍👨</span>' : '';
-            
+
+            // 行程：改用細色條，J / C / S 各一條
+            let bars = '';
+            if(dAt.j && dAt.j.length) bars += '<div class="bar bar-j"></div>';
+            if(dAt.c && dAt.c.length) bars += '<div class="bar bar-c"></div>';
+            if(dAt.s && dAt.s.length) bars += '<div class="bar bar-s"></div>';
+
+            // 気分
+            let mood = '';
+            if(dAt.moodJ) mood += `<span class="mood-j">${dAt.moodJ}</span>`;
+            if(dAt.moodS) mood += `<span class="mood-s">${dAt.moodS}</span>`;
+
+            // 事前避孕藥
+            const pn = pillNo(s);
+            const pillHtml = pn ? (dAt.pillTaken ? '<span class="pill-ok">✓</span>' : `<span class="pill-num">${pn}</span>`) : '';
+
+            const icons = `${dAt.heart?'💞':''}${dAt.business?'💼':''}${dAt.racing?'🏎️':''}`;
+
             cell.innerHTML = `
-                <div class="day-num">${d}</div>
-                ${ev?`<span class="anniv-icon">${ev.type==='anniv'?'🎂':'🔔'}</span>`:''}
-                <div style="display:flex; gap:2px; align-items:center;">${jS}${sS}${cS}</div>
-                <div class="mood-box"><span class="mood-j">${dAt.moodJ||''}</span> <span class="mood-s">${dAt.moodS||''}</span></div>
-                <div style="margin-top:auto; font-size:14px;">${dAt.business?'💼':''}</div>
-                ${dAt.heart?'<span style="position:absolute; bottom:4px; right:4px; font-size:12px;">💞</span>':''}
+                <div class="day-head">
+                    <span class="day-num">${d}</span>
+                    ${ev ? `<span class="ev-dot">${ev.type==='anniv'?'🎂':'🔔'}</span>` : ''}
+                </div>
+                ${bars ? `<div class="bars">${bars}</div>` : ''}
+                ${mood ? `<div class="mood-row">${mood}</div>` : ''}
+                <div class="cell-foot"><span class="foot-icons">${icons}</span>${pillHtml}</div>
             `;
-            cell.onclick = () => { selDate = s; render(); show(s); }; grid.appendChild(cell);
+            cell.onclick = () => { selDate = s; render(); show(s); };
+            grid.appendChild(cell);
         }
     }
 
@@ -221,16 +455,67 @@
             if (target < today) target = new Date(nowY + 1, p[1] - 1, p[2]).getTime();
             return { ...e, diff: Math.ceil((target - today) / (1000*60*60*24)) };
         }).sort((a,b) => a.diff - b.diff).slice(0, 3);
+
+        let pillMsg = "";
+        if(pillStart) {
+            const tk = todayKey(), pn = pillNo(tk);
+            if(pn) {
+                const taken = !!(cloudData[tk] || {}).pillTaken;
+                pillMsg = taken
+                    ? `<div class="notice-row"><span class="notice-pill-ok">💊 本日 ${pn} 錠目：服用済み ✓</span></div>`
+                    : `<div class="notice-row"><span class="notice-pill-warn">💊 本日 ${pn} 錠目：未服用</span></div>`;
+            } else if (toDate(tk) >= toDate(pillStart)) {
+                pillMsg = `<div class="notice-row"><span class="notice-pill-warn">💊 1 シート（28錠）終了。次のシートを設定してください</span></div>`;
+            }
+        }
+
         const bar = document.getElementById('anniv-notice');
-        if(list.length > 0) { bar.innerHTML = list.map(e => `🔔 ${e.name}: あと ${e.diff} 日`).join('<br>'); bar.style.display = 'block'; }
+        const rows = [];
+        if(pillMsg) rows.push(pillMsg);
+        list.forEach(e => rows.push(`<div class="notice-row notice-ev">${e.type==='anniv'?'🎂':'🔔'} ${e.name}<span style="margin-left:auto;">あと <b>${e.diff}</b> 日</span></div>`));
+        if(rows.length) { bar.innerHTML = rows.join(''); bar.style.display = 'block'; }
+        else { bar.style.display = 'none'; }
     }
 
+    /* ---------- 服藥面板 ---------- */
+    function renderPill(s) {
+        const dAt = cloudData[s] || {};
+        const pn = pillNo(s);
+        const cnt = document.getElementById('pill-count');
+        const btn = document.getElementById('pill-btn');
+        if(pn) {
+            cnt.innerText = `${pn} / ${PACK_SIZE} 錠目`;
+            btn.style.display = 'block';
+            const taken = !!dAt.pillTaken;
+            btn.innerText = taken ? '✓ 服用済み' : '未服用';
+            btn.className = 'pill-toggle' + (taken ? ' taken' : '');
+        } else {
+            cnt.innerText = pillStart ? 'シート範囲外' : '開始日 未設定';
+            btn.style.display = 'none';
+        }
+    }
+
+    function togglePill() {
+        if(!selDate || !pillNo(selDate)) return;
+        const cur = !!(cloudData[selDate] || {}).pillTaken;
+        db.ref('calendar/' + selDate + '/pillTaken').set(!cur).then(() => toast(cur ? '未服用に戻しました' : '服用を記録しました'));
+    }
+
+    function startPack() {
+        if(!selDate) return;
+        const [y,m,d] = selDate.split('-');
+        if(!confirm(`${y}/${m}/${d} を 1 錠目に設定します。よろしいですか？`)) return;
+        db.ref('pill').set({ start: selDate }).then(() => toast('新しいシートを開始しました'));
+    }
+
+    /* ---------- 日期詳細 ---------- */
     function show(s, soft = false) {
         document.getElementById('details-panel').style.display = 'block';
         const [y, m, d] = s.split('-').map(Number);
-        const dayJP = ['日','月','火','水','木','金','土'][new Date(y, m-1, d).getDay()];
-        document.getElementById('date-label').innerText = `${y}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}(${dayJP})`;
+        const dayJP = WD[new Date(y, m-1, d).getDay()];
+        document.getElementById('date-label').innerText = `${y}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}（${dayJP}）`;
         const dAt = cloudData[s] || { moodJ:"", moodS:"", memo:"" };
+        renderPill(s);
         if(!soft) {
             const sortL = (l) => (l || []).sort((a,b) => {
                 if(!a.time && !b.time) return 0; if(!a.time) return -1; if(!b.time) return 1; return a.time.localeCompare(b.time);
@@ -240,49 +525,82 @@
                 sortL(l).forEach(t => addRow(id.split('-')[0], t.time, t.text));
                 if(!l || l.length === 0) addRow(id.split('-')[0], "", "");
             };
-            rend('j-tasks', dAt.j); 
-            rend('c-tasks', dAt.c); // 渲染共通行程
+            rend('j-tasks', dAt.j);
+            rend('c-tasks', dAt.c);
             rend('s-tasks', dAt.s);
-            
-            document.getElementById('mood-j').value = dAt.moodJ || ""; document.getElementById('mood-s').value = dAt.moodS || ""; document.getElementById('memo-input').value = dAt.memo || "";
+
+            document.getElementById('mood-j').value = dAt.moodJ || "";
+            document.getElementById('mood-s').value = dAt.moodS || "";
+            document.getElementById('memo-input').value = dAt.memo || "";
             const u = (id, a, c) => { const b = document.getElementById(id); if(a) b.classList.add(c); else b.classList.remove(c); };
-            u('heart-btn', dAt.heart, 'active-heart'); u('red-btn', dAt.red, 'active-red'); u('rainbow-btn', dAt.rainbow, 'active-rainbow'); u('black-btn', dAt.black, 'active-black'); u('business-btn', dAt.business, 'active-business');
+            u('heart-btn', dAt.heart, 'active-heart'); u('red-btn', dAt.red, 'active-red');
+            u('rainbow-btn', dAt.rainbow, 'active-rainbow'); u('black-btn', dAt.black, 'active-black');
+            u('business-btn', dAt.business, 'active-business'); u('racing-btn', dAt.racing, 'active-racing');
         }
     }
 
+    function getPHX(t) {
+        if(!t || !selDate) return "--";
+        const p = t.split(':');
+        const phx = new Date(new Date(selDate.replace(/-/g,'/')).setHours(p[0], p[1])).getTime() - (15*60*60*1000);
+        const d = new Date(phx);
+        return `PHX ${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}） ${String(d.getHours()).padStart(2,'0')}:00`;
+    }
+
     function addRow(type, time="", text="") {
-        const div = document.createElement('div'); div.className = 'task-row';
-        // 邊框顏色區分
-        if(type === 'c') div.style.borderLeftColor = 'var(--c-purple)';
-        
-        const getPHX = (t) => { if(!t) return "--"; const p=t.split(':'); const phx=new Date(new Date(selDate.replace(/-/g,'/')).setHours(p[0],p[1])).getTime()-(15*60*60*1000); const d=new Date(phx); return `PHX:${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}(${['日','月','火','水','木','金','土'][d.getDay()]}) ${String(d.getHours()).padStart(2,'0')}:00`; };
-        div.innerHTML = `<div class="input-group"><input type="time" class="time-in t-time" value="${time}" oninput="this.parentElement.nextElementSibling.innerText=getPHX(this.value)"><input type="text" class="task-in t-text" value="${text}" placeholder="予定內容"></div><div class="phx-info">${getPHX(time)}</div><button onclick="this.parentElement.remove()" style="position:absolute; top:8px; right:8px; border:none; background:none; color:#ccc; font-size:18px;">🗑️</button>`;
+        const div = document.createElement('div');
+        div.className = 'task-row row-' + type;
+        div.innerHTML = `<div class="input-group"><input type="time" class="time-in t-time" value="${time}" oninput="this.parentElement.nextElementSibling.innerText=getPHX(this.value)"><input type="text" class="task-in t-text" value="${text}" placeholder="予定内容"></div><div class="phx-info">${getPHX(time)}</div><button class="btn-del" onclick="this.parentElement.remove()">🗑️</button>`;
         document.getElementById(type + '-tasks').appendChild(div);
     }
     function addRRow(type) { addRow(type, "", ""); }
-    
+
     function save() {
         const getT = (id) => Array.from(document.getElementById(id).querySelectorAll('.task-row')).map(r => ({ time: r.querySelector('.t-time').value, text: r.querySelector('.t-text').value })).filter(t => t.time || t.text);
-        const dAt = { 
-            j: getT('j-tasks'), 
-            s: getT('s-tasks'), 
-            c: getT('c-tasks'), // 儲存共通行程
-            moodJ: document.getElementById('mood-j').value, 
-            moodS: document.getElementById('mood-s').value, 
-            red: document.getElementById('red-btn').classList.contains('active-red'), 
-            rainbow: document.getElementById('rainbow-btn').classList.contains('active-rainbow'), 
-            black: document.getElementById('black-btn').classList.contains('active-black'), 
-            business: document.getElementById('business-btn').classList.contains('active-business'), 
-            heart: document.getElementById('heart-btn').classList.contains('active-heart'), 
-            memo: document.getElementById('memo-input').value 
+        const dAt = {
+            j: getT('j-tasks'),
+            s: getT('s-tasks'),
+            c: getT('c-tasks'),
+            moodJ: document.getElementById('mood-j').value,
+            moodS: document.getElementById('mood-s').value,
+            red: document.getElementById('red-btn').classList.contains('active-red'),
+            rainbow: document.getElementById('rainbow-btn').classList.contains('active-rainbow'),
+            black: document.getElementById('black-btn').classList.contains('active-black'),
+            business: document.getElementById('business-btn').classList.contains('active-business'),
+            racing: document.getElementById('racing-btn').classList.contains('active-racing'),
+            heart: document.getElementById('heart-btn').classList.contains('active-heart'),
+            pillTaken: !!(cloudData[selDate] || {}).pillTaken,
+            memo: document.getElementById('memo-input').value
         };
-        db.ref('calendar/' + selDate).set(dAt).then(() => alert("更新完了"));
+        db.ref('calendar/' + selDate).set(dAt).then(() => toast('更新しました'));
     }
-    
+
+    function goToday() {
+        curMonth = new Date();
+        selDate = todayKey();
+        render(); show(selDate);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function openFull(id) { document.getElementById('screen-' + id).style.display = 'block'; }
     function closeFull(id) { document.getElementById('screen-' + id).style.display = 'none'; }
-    function addEvent() { const date = document.getElementById('ev-date').value, name = document.getElementById('ev-name').value; if(!date||!name) return; db.ref('events').push({ date: date.split('-').map(Number).join('-'), name, type: document.getElementById('ev-type').value }).then(() => alert("保存しました")); }
-    function renderEventList() { const c = document.getElementById('event-list-container'); c.innerHTML = ""; Object.entries(eventData).forEach(([id, ev]) => { const d = document.createElement('div'); d.className = 'event-card'; d.innerHTML = `<strong>${ev.type==='anniv'?'🎂':'🔔'} ${ev.name}</strong><br><small>${ev.date}</small><button onclick="db.ref('events/${id}').remove()" style="position:absolute; bottom:15px; right:15px; border:none; background:none; color:red; font-weight:bold;">削除</button>`; c.appendChild(d); }); }
+
+    function addEvent() {
+        const date = document.getElementById('ev-date').value, name = document.getElementById('ev-name').value;
+        if(!date || !name) { toast('日付と項目名を入力してください'); return; }
+        db.ref('events').push({ date: date.split('-').map(Number).join('-'), name, type: document.getElementById('ev-type').value })
+            .then(() => { document.getElementById('ev-name').value = ''; toast('保存しました'); });
+    }
+
+    function renderEventList() {
+        const c = document.getElementById('event-list-container'); c.innerHTML = "";
+        Object.entries(eventData).forEach(([id, ev]) => {
+            const d = document.createElement('div'); d.className = 'event-card';
+            d.innerHTML = `<strong>${ev.type==='anniv'?'🎂':'🔔'} ${ev.name}</strong><br><small>${ev.date}</small><button class="btn-remove" onclick="db.ref('events/${id}').remove()">削除</button>`;
+            c.appendChild(d);
+        });
+    }
+
     function changeMonth(n) { curMonth.setMonth(curMonth.getMonth() + n); render(); }
 </script>
 </body>
