@@ -11,53 +11,23 @@
     <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-database-compat.js"></script>
     <style>
         :root {
-            --bg: #f2f4f7;
-            --card: #ffffff;
-            --line: #e6e9ee;
-            --line-soft: #f0f2f5;
-            --text: #1c1f25;
-            --muted: #8b93a1;
-            --faint: #c8cdd6;
-
-            --accent: #1f6feb;
-            --j: #2e8b57;
-            --s: #d94848;
-            --c: #7a5af5;
-            --heart: #e8608f;
-            --racing: #d97316;
-            --warn: #c2410c;
-
-            --j-soft: #eaf5ee;
-            --s-soft: #fdeded;
-            --c-soft: #f1edff;
-            --accent-soft: #e9f1fe;
-
+            --bg: #f2f4f7; --card: #ffffff; --line: #e6e9ee; --line-soft: #f0f2f5;
+            --text: #1c1f25; --muted: #8b93a1; --faint: #c8cdd6;
+            --accent: #1f6feb; --j: #2e8b57; --s: #d94848; --c: #7a5af5;
+            --heart: #e8608f; --racing: #d97316; --warn: #c2410c;
+            --j-soft: #eaf5ee; --s-soft: #fdeded; --c-soft: #f1edff; --accent-soft: #e9f1fe;
+            --pred: #fdf0f0;
             --radius: 12px;
             --shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px rgba(16,24,40,.05);
         }
         @media (prefers-color-scheme: dark) {
             :root {
-                --bg: #0e1014;
-                --card: #171a20;
-                --line: #272c35;
-                --line-soft: #1f232b;
-                --text: #e7e9ee;
-                --muted: #8b93a1;
-                --faint: #4a515d;
-
-                --accent: #4c8dff;
-                --j: #4cc38a;
-                --s: #f0736a;
-                --c: #9d86ff;
-                --heart: #f57fa8;
-                --racing: #f0913f;
-                --warn: #f0913f;
-
-                --j-soft: #16261d;
-                --s-soft: #2a1919;
-                --c-soft: #1e1a2e;
-                --accent-soft: #14213a;
-
+                --bg: #0e1014; --card: #171a20; --line: #272c35; --line-soft: #1f232b;
+                --text: #e7e9ee; --muted: #8b93a1; --faint: #4a515d;
+                --accent: #4c8dff; --j: #4cc38a; --s: #f0736a; --c: #9d86ff;
+                --heart: #f57fa8; --racing: #f0913f; --warn: #f0913f;
+                --j-soft: #16261d; --s-soft: #2a1919; --c-soft: #1e1a2e; --accent-soft: #14213a;
+                --pred: #241618;
                 --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 16px rgba(0,0,0,.3);
             }
         }
@@ -67,14 +37,13 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang TC", "Hiragino Sans", sans-serif;
             margin: 0; background: var(--bg); color: var(--text);
-            -webkit-tap-highlight-color: transparent;
-            -webkit-font-smoothing: antialiased;
+            -webkit-tap-highlight-color: transparent; -webkit-font-smoothing: antialiased;
             font-feature-settings: "tnum" 1;
         }
         button, input, select, textarea { font-family: inherit; color: var(--text); }
         input, select, textarea { font-size: 16px; }
 
-        /* ================= 登入介面（維持原樣式） ================= */
+        /* ================= 登入介面 ================= */
         #login-screen { position: fixed; inset: 0; background: #fff; color: #333; z-index: 10000; overflow-y: auto; }
         .nav-bar { background: #fff; border-bottom: 2px solid #0056b3; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; }
         .logo { color: #0056b3; font-size: 16px; font-weight: 900; text-decoration: none; white-space: nowrap; }
@@ -97,6 +66,7 @@
         .notice-row + .notice-row { margin-top: 4px; }
         .notice-pill-ok { color: var(--j); font-weight: 600; }
         .notice-pill-warn { color: var(--warn); font-weight: 700; }
+        .notice-pred { color: var(--s); font-weight: 600; }
         .notice-ev { color: var(--muted); }
         .notice-ev b { color: var(--text); font-weight: 600; }
 
@@ -113,16 +83,15 @@
         .weekday.wk-sat { color: var(--accent); }
 
         .day-cell {
-            min-height: 78px; border: 1px solid var(--line); border-radius: 10px;
+            min-height: 70px; border: 1px solid var(--line); border-radius: 10px;
             position: relative; padding: 5px 5px 4px; background: var(--card);
             display: flex; flex-direction: column; overflow: hidden;
             transition: box-shadow .12s ease;
         }
-        /* 狀態邊框：與「選取」互不干擾 */
+        .pred-red { background: var(--pred); }
         .hi-red { border: 1.5px solid var(--s); }
         .hi-black { border: 1.5px solid var(--text); }
         .hi-rainbow { border: 1.5px solid transparent; background: linear-gradient(var(--card), var(--card)) padding-box, linear-gradient(115deg, #ff5f6d, #ffc371, #4ade80, #38bdf8, #a78bfa) border-box; }
-        /* 選取：外圈光環 + 內層淡色覆蓋（彩虹格也不會破圖） */
         .selected-day { box-shadow: 0 0 0 2.5px var(--accent), inset 0 0 0 999px var(--accent-soft); }
 
         .day-head { display: flex; align-items: center; justify-content: space-between; height: 20px; }
@@ -138,46 +107,52 @@
         .bar-c { background: var(--c); }
         .bar-s { background: var(--s); }
 
-        .mood-row { margin-top: 3px; display: flex; gap: 4px; font-size: 9.5px; font-weight: 700; line-height: 1; }
-        .mood-j { color: var(--j); }
-        .mood-s { color: var(--s); }
-
         .cell-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; gap: 2px; }
         .foot-icons { display: flex; gap: 1px; font-size: 11px; line-height: 1; }
         .pill-num { font-size: 10px; color: var(--faint); font-weight: 600; }
+        .pill-num.placebo { color: var(--s); opacity: .55; }
         .pill-ok { font-size: 11px; color: var(--j); font-weight: 900; }
 
         /* ---- 詳細面板 ---- */
         #details-panel { margin-top: 16px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px 15px; box-shadow: var(--shadow); }
         .date-title { text-align: center; font-size: 17px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line-soft); }
 
-        .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .sec-head + .sec-head, .task-list + .sec-head { margin-top: 18px; }
+        .sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+        .task-list + .sec-head { margin-top: 18px; }
         .sec-tag { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 7px; font-size: 12px; font-weight: 900; color: #fff; }
         .tag-j { background: var(--j); }
         .tag-c { background: var(--c); }
         .tag-s { background: var(--s); }
         .sec-left { display: flex; align-items: center; gap: 8px; }
-        .mood-sel { border: 1px solid var(--line); background: var(--card); border-radius: 7px; padding: 4px 6px; font-size: 13px; }
-        .sec-note { font-size: 12px; color: var(--muted); }
+        .sec-note { font-size: 12px; color: var(--muted); font-weight: 600; }
         .btn-add { font-size: 11.5px; font-weight: 600; color: var(--muted); background: var(--card); border: 1px solid var(--line); padding: 6px 10px; border-radius: 8px; }
         .btn-add:active { border-color: var(--accent); color: var(--accent); }
+
+        .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+        .chip { font-size: 12px; font-weight: 600; padding: 5px 11px; border-radius: 14px; border: 1px solid var(--line); background: var(--card); color: var(--muted); }
+        .chip:active { background: var(--line-soft); }
+        .chip.c-j:active { border-color: var(--j); color: var(--j); }
+        .chip.c-c:active { border-color: var(--c); color: var(--c); }
+        .chip.c-s:active { border-color: var(--s); color: var(--s); }
 
         .task-row { background: var(--line-soft); padding: 11px 12px; border-radius: 10px; margin-bottom: 8px; position: relative; border-left: 3px solid var(--faint); }
         .task-row.row-j { border-left-color: var(--j); }
         .task-row.row-c { border-left-color: var(--c); }
         .task-row.row-s { border-left-color: var(--s); }
-        .input-group { display: flex; gap: 10px; align-items: center; margin-bottom: 6px; }
+        .input-group { display: flex; gap: 10px; align-items: center; }
         .time-in { border: 1px solid var(--line); border-radius: 7px; padding: 7px; width: 104px; background: var(--card); }
         .task-in { flex: 1; border: none; background: transparent; padding: 7px 2px; outline: none; border-bottom: 1.5px solid var(--line); }
-        .phx-info { font-size: 11.5px; color: var(--accent); font-weight: 600; background: var(--accent-soft); padding: 4px 9px; border-radius: 5px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .phx-info { font-size: 11.5px; color: var(--accent); font-weight: 600; background: var(--accent-soft); padding: 4px 9px; border-radius: 5px; display: none; margin-top: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .btn-del { position: absolute; top: 6px; right: 6px; border: none; background: none; color: var(--faint); font-size: 15px; padding: 4px; }
 
         /* ---- 服藥區 ---- */
         .pill-box { background: var(--j-soft); border: 1px solid transparent; border-radius: 12px; padding: 13px 14px; margin: 12px 0 4px; }
+        .pill-box.is-placebo { background: var(--pred); }
         .pill-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .pill-title { font-size: 13px; font-weight: 800; color: var(--j); }
+        .pill-box.is-placebo .pill-title { color: var(--s); }
         .pill-count { font-size: 13px; color: var(--text); margin-left: 7px; font-weight: 600; }
+        .pill-sub { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
         .pill-toggle { border: 1.5px solid var(--faint); background: var(--card); color: var(--muted); font-size: 13px; font-weight: 700; padding: 9px 15px; border-radius: 20px; white-space: nowrap; }
         .pill-toggle.taken { border-color: var(--j); color: #fff; background: var(--j); }
         .pill-reset { font-size: 11px; color: var(--muted); background: none; border: 1px solid var(--line); padding: 5px 9px; border-radius: 7px; }
@@ -196,7 +171,6 @@
         .submit-btn { width: 100%; padding: 16px; background: var(--accent); border: none; border-radius: 12px; color: #fff; font-weight: 700; font-size: 16px; margin-top: 14px; }
         .link-btn { display: block; width: 100%; text-align: center; font-size: 13px; color: var(--muted); background: none; border: none; margin-top: 20px; font-weight: 600; }
 
-        /* ---- 今日按鈕 ---- */
         #today-btn {
             position: fixed; left: 50%; transform: translateX(-50%);
             bottom: calc(18px + env(safe-area-inset-bottom));
@@ -204,8 +178,6 @@
             padding: 11px 22px; border-radius: 22px; font-size: 13px; font-weight: 700;
             box-shadow: 0 4px 18px rgba(0,0,0,.22); z-index: 900; display: none;
         }
-
-        /* ---- Toast ---- */
         #toast {
             position: fixed; left: 50%; transform: translate(-50%, 20px);
             bottom: calc(72px + env(safe-area-inset-bottom));
@@ -216,11 +188,10 @@
         }
         #toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-        /* ---- 全螢幕 ---- */
         .full-screen { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; overflow-y: auto; padding: calc(20px + env(safe-area-inset-top)) 15px calc(30px + env(safe-area-inset-bottom)); }
         .fs-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
         .fs-title { margin: 0; font-size: 20px; font-weight: 800; }
-        .fs-close { border: none; background: var(--card); border: 1px solid var(--line); width: 34px; height: 34px; border-radius: 50%; font-size: 16px; color: var(--muted); }
+        .fs-close { background: var(--card); border: 1px solid var(--line); width: 34px; height: 34px; border-radius: 50%; font-size: 16px; color: var(--muted); }
         .panel { background: var(--card); border: 1px solid var(--line); padding: 18px; border-radius: 16px; margin-bottom: 22px; box-shadow: var(--shadow); }
         .field-label { display: block; text-align: left; font-size: 12px; color: var(--muted); font-weight: 600; margin: 0 0 6px 2px; }
         .form-input { width: 100%; padding: 12px; border: 1px solid var(--line); border-radius: 9px; margin-bottom: 16px; outline: none; background: var(--line-soft); }
@@ -270,16 +241,13 @@
         <div id="date-label" class="date-title"></div>
 
         <div class="sec-head">
-            <div class="sec-left">
-                <span class="sec-tag tag-j">J</span>
-                <select id="mood-j" class="mood-sel"><option value="">気分 -</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
-            </div>
+            <div class="sec-left"><span class="sec-tag tag-j">J</span></div>
             <button class="btn-add" onclick="addRRow('j')">＋ 予定</button>
         </div>
+        <div class="chips" id="chips-j"></div>
         <div id="j-tasks" class="task-list"></div>
 
-        <!-- 事前避孕藥（悅姿 28錠 / J） -->
-        <div class="pill-box">
+        <div class="pill-box" id="pill-box">
             <div class="pill-head">
                 <div>
                     <span class="pill-title">💊 ヤーズ</span>
@@ -287,27 +255,24 @@
                 </div>
                 <button id="pill-btn" class="pill-toggle" onclick="togglePill()">未服用</button>
             </div>
+            <div id="pill-sub" class="pill-sub"></div>
             <div style="margin-top:10px; text-align:right;">
                 <button class="pill-reset" onclick="startPack()">この日を 1 錠目にする</button>
             </div>
         </div>
 
         <div class="sec-head">
-            <div class="sec-left">
-                <span class="sec-tag tag-c">C</span>
-                <span class="sec-note">共通</span>
-            </div>
+            <div class="sec-left"><span class="sec-tag tag-c">C</span><span class="sec-note">共通</span></div>
             <button class="btn-add" onclick="addRRow('c')">＋ 共通予定</button>
         </div>
+        <div class="chips" id="chips-c"></div>
         <div id="c-tasks" class="task-list"></div>
 
         <div class="sec-head">
-            <div class="sec-left">
-                <span class="sec-tag tag-s">S</span>
-                <select id="mood-s" class="mood-sel"><option value="">気分 -</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option></select>
-            </div>
+            <div class="sec-left"><span class="sec-tag tag-s">S</span></div>
             <button class="btn-add" onclick="addRRow('s')">＋ 予定</button>
         </div>
+        <div class="chips" id="chips-s"></div>
         <div id="s-tasks" class="task-list"></div>
 
         <div class="btn-menu">
@@ -356,8 +321,17 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     let curMonth = new Date(), selDate = "", cloudData = {}, eventData = {}, pillStart = "";
-    const PACK_SIZE = 28;
+
+    const PACK_SIZE = 28;      // 1シート28錠
+    const ACTIVE = 24;         // 実薬24錠（25〜28錠目はプラセボ）
     const WD = ['日','月','火','水','木','金','土'];
+
+    // 実データの高頻度予定から生成したクイック入力
+    const CHIPS = {
+        j: ['健身', '做臉', '美甲', '廖老師家', '睫毛', '原反依賴'],
+        c: ['台北', '高鐵台中-左營', '演唱會'],
+        s: ['做臉', '整骨', '在宅']
+    };
 
     function toast(msg) {
         const t = document.getElementById('toast');
@@ -370,6 +344,7 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('app').style.display = 'block';
             document.getElementById('today-btn').style.display = 'block';
+            renderChips();
             startSync();
         } else { alert('帳號或密碼錯誤'); }
     }
@@ -387,6 +362,18 @@
         if(!pillStart) return 0;
         const diff = Math.round((toDate(key) - toDate(pillStart)) / 86400000);
         return (diff >= 0 && diff < PACK_SIZE) ? diff + 1 : 0;
+    }
+    // 25〜28錠目 = プラセボ期間（生理予測区間）
+    function isPlacebo(key) { const n = pillNo(key); return n > ACTIVE && n <= PACK_SIZE; }
+
+    /* ---------- クイック入力 ---------- */
+    function renderChips() {
+        ['j','c','s'].forEach(type => {
+            const box = document.getElementById('chips-' + type);
+            box.innerHTML = CHIPS[type].map(t =>
+                `<button class="chip c-${type}" onclick="addRow('${type}','','${t}')">${t}</button>`
+            ).join('');
+        });
     }
 
     /* ---------- 月曆 ---------- */
@@ -409,6 +396,8 @@
             if(s === tk) cell.classList.add('is-today');
 
             const dAt = cloudData[s] || {};
+            const placebo = isPlacebo(s);
+            if(placebo && !dAt.red) cell.classList.add('pred-red');
             if(dAt.red) cell.classList.add('hi-red');
             else if(dAt.rainbow) cell.classList.add('hi-rainbow');
             else if(dAt.black) cell.classList.add('hi-black');
@@ -416,20 +405,15 @@
 
             const ev = Object.values(eventData).find(e => { const p = e.date.split('-'); return p[1] == (m+1) && p[2] == d; });
 
-            // 行程：改用細色條，J / C / S 各一條
             let bars = '';
             if(dAt.j && dAt.j.length) bars += '<div class="bar bar-j"></div>';
             if(dAt.c && dAt.c.length) bars += '<div class="bar bar-c"></div>';
             if(dAt.s && dAt.s.length) bars += '<div class="bar bar-s"></div>';
 
-            // 気分
-            let mood = '';
-            if(dAt.moodJ) mood += `<span class="mood-j">${dAt.moodJ}</span>`;
-            if(dAt.moodS) mood += `<span class="mood-s">${dAt.moodS}</span>`;
-
-            // 事前避孕藥
             const pn = pillNo(s);
-            const pillHtml = pn ? (dAt.pillTaken ? '<span class="pill-ok">✓</span>' : `<span class="pill-num">${pn}</span>`) : '';
+            const pillHtml = pn
+                ? (dAt.pillTaken ? '<span class="pill-ok">✓</span>' : `<span class="pill-num ${placebo?'placebo':''}">${pn}</span>`)
+                : '';
 
             const icons = `${dAt.heart?'💞':''}${dAt.business?'💼':''}${dAt.racing?'🏎️':''}`;
 
@@ -439,7 +423,6 @@
                     ${ev ? `<span class="ev-dot">${ev.type==='anniv'?'🎂':'🔔'}</span>` : ''}
                 </div>
                 ${bars ? `<div class="bars">${bars}</div>` : ''}
-                ${mood ? `<div class="mood-row">${mood}</div>` : ''}
                 <div class="cell-foot"><span class="foot-icons">${icons}</span>${pillHtml}</div>
             `;
             cell.onclick = () => { selDate = s; render(); show(s); };
@@ -456,23 +439,27 @@
             return { ...e, diff: Math.ceil((target - today) / (1000*60*60*24)) };
         }).sort((a,b) => a.diff - b.diff).slice(0, 3);
 
-        let pillMsg = "";
+        const rows = [];
         if(pillStart) {
             const tk = todayKey(), pn = pillNo(tk);
             if(pn) {
                 const taken = !!(cloudData[tk] || {}).pillTaken;
-                pillMsg = taken
+                rows.push(taken
                     ? `<div class="notice-row"><span class="notice-pill-ok">💊 本日 ${pn} 錠目：服用済み ✓</span></div>`
-                    : `<div class="notice-row"><span class="notice-pill-warn">💊 本日 ${pn} 錠目：未服用</span></div>`;
-            } else if (toDate(tk) >= toDate(pillStart)) {
-                pillMsg = `<div class="notice-row"><span class="notice-pill-warn">💊 1 シート（28錠）終了。次のシートを設定してください</span></div>`;
+                    : `<div class="notice-row"><span class="notice-pill-warn">💊 本日 ${pn} 錠目：未服用</span></div>`);
+                if(isPlacebo(tk)) {
+                    rows.push(`<div class="notice-row"><span class="notice-pred">🩸 プラセボ期間（${pn}/${PACK_SIZE}）：生理予測区間</span></div>`);
+                } else {
+                    const toPlacebo = (ACTIVE + 1) - pn;
+                    rows.push(`<div class="notice-row notice-ev">🩸 プラセボ開始まで <b>${toPlacebo}</b> 日</div>`);
+                }
+            } else {
+                rows.push(`<div class="notice-row"><span class="notice-pill-warn">💊 1 シート（28錠）終了。次のシートを設定してください</span></div>`);
             }
         }
+        list.forEach(e => rows.push(`<div class="notice-row notice-ev">${e.type==='anniv'?'🎂':'🔔'} ${e.name}<span style="margin-left:auto;">あと <b>${e.diff}</b> 日</span></div>`));
 
         const bar = document.getElementById('anniv-notice');
-        const rows = [];
-        if(pillMsg) rows.push(pillMsg);
-        list.forEach(e => rows.push(`<div class="notice-row notice-ev">${e.type==='anniv'?'🎂':'🔔'} ${e.name}<span style="margin-left:auto;">あと <b>${e.diff}</b> 日</span></div>`));
         if(rows.length) { bar.innerHTML = rows.join(''); bar.style.display = 'block'; }
         else { bar.style.display = 'none'; }
     }
@@ -481,16 +468,23 @@
     function renderPill(s) {
         const dAt = cloudData[s] || {};
         const pn = pillNo(s);
+        const box = document.getElementById('pill-box');
         const cnt = document.getElementById('pill-count');
+        const sub = document.getElementById('pill-sub');
         const btn = document.getElementById('pill-btn');
+        const placebo = isPlacebo(s);
+        box.className = 'pill-box' + (placebo ? ' is-placebo' : '');
+
         if(pn) {
             cnt.innerText = `${pn} / ${PACK_SIZE} 錠目`;
+            sub.innerText = placebo ? 'プラセボ（25〜28錠目）・生理予測区間' : `実薬 ${pn}/${ACTIVE}`;
             btn.style.display = 'block';
             const taken = !!dAt.pillTaken;
             btn.innerText = taken ? '✓ 服用済み' : '未服用';
             btn.className = 'pill-toggle' + (taken ? ' taken' : '');
         } else {
             cnt.innerText = pillStart ? 'シート範囲外' : '開始日 未設定';
+            sub.innerText = '';
             btn.style.display = 'none';
         }
     }
@@ -514,7 +508,7 @@
         const [y, m, d] = s.split('-').map(Number);
         const dayJP = WD[new Date(y, m-1, d).getDay()];
         document.getElementById('date-label').innerText = `${y}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}（${dayJP}）`;
-        const dAt = cloudData[s] || { moodJ:"", moodS:"", memo:"" };
+        const dAt = cloudData[s] || { memo:"" };
         renderPill(s);
         if(!soft) {
             const sortL = (l) => (l || []).sort((a,b) => {
@@ -529,8 +523,6 @@
             rend('c-tasks', dAt.c);
             rend('s-tasks', dAt.s);
 
-            document.getElementById('mood-j').value = dAt.moodJ || "";
-            document.getElementById('mood-s').value = dAt.moodS || "";
             document.getElementById('memo-input').value = dAt.memo || "";
             const u = (id, a, c) => { const b = document.getElementById(id); if(a) b.classList.add(c); else b.classList.remove(c); };
             u('heart-btn', dAt.heart, 'active-heart'); u('red-btn', dAt.red, 'active-red');
@@ -540,29 +532,42 @@
     }
 
     function getPHX(t) {
-        if(!t || !selDate) return "--";
+        if(!t || !selDate) return "";
         const p = t.split(':');
         const phx = new Date(new Date(selDate.replace(/-/g,'/')).setHours(p[0], p[1])).getTime() - (15*60*60*1000);
         const d = new Date(phx);
         return `PHX ${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${WD[d.getDay()]}） ${String(d.getHours()).padStart(2,'0')}:00`;
     }
 
+    // 時刻が空なら PHX 行を表示しない
+    function updPHX(el) {
+        const box = el.closest('.task-row').querySelector('.phx-info');
+        if(el.value) { box.innerText = getPHX(el.value); box.style.display = 'inline-block'; }
+        else { box.style.display = 'none'; }
+    }
+
     function addRow(type, time="", text="") {
         const div = document.createElement('div');
         div.className = 'task-row row-' + type;
-        div.innerHTML = `<div class="input-group"><input type="time" class="time-in t-time" value="${time}" oninput="this.parentElement.nextElementSibling.innerText=getPHX(this.value)"><input type="text" class="task-in t-text" value="${text}" placeholder="予定内容"></div><div class="phx-info">${getPHX(time)}</div><button class="btn-del" onclick="this.parentElement.remove()">🗑️</button>`;
+        div.innerHTML =
+            `<div class="input-group">
+                <input type="time" class="time-in t-time" value="${time}" oninput="updPHX(this)">
+                <input type="text" class="task-in t-text" value="${text}" placeholder="予定内容">
+             </div>
+             <div class="phx-info" ${time ? 'style="display:inline-block"' : ''}>${time ? getPHX(time) : ''}</div>
+             <button class="btn-del" onclick="this.parentElement.remove()">🗑️</button>`;
         document.getElementById(type + '-tasks').appendChild(div);
     }
     function addRRow(type) { addRow(type, "", ""); }
 
     function save() {
-        const getT = (id) => Array.from(document.getElementById(id).querySelectorAll('.task-row')).map(r => ({ time: r.querySelector('.t-time').value, text: r.querySelector('.t-text').value })).filter(t => t.time || t.text);
+        const getT = (id) => Array.from(document.getElementById(id).querySelectorAll('.task-row'))
+            .map(r => ({ time: r.querySelector('.t-time').value, text: r.querySelector('.t-text').value }))
+            .filter(t => t.time || t.text);
         const dAt = {
             j: getT('j-tasks'),
             s: getT('s-tasks'),
             c: getT('c-tasks'),
-            moodJ: document.getElementById('mood-j').value,
-            moodS: document.getElementById('mood-s').value,
             red: document.getElementById('red-btn').classList.contains('active-red'),
             rainbow: document.getElementById('rainbow-btn').classList.contains('active-rainbow'),
             black: document.getElementById('black-btn').classList.contains('active-black'),
@@ -572,7 +577,10 @@
             pillTaken: !!(cloudData[selDate] || {}).pillTaken,
             memo: document.getElementById('memo-input').value
         };
-        db.ref('calendar/' + selDate).set(dAt).then(() => toast('更新しました'));
+        // 中身が何もない日はノードごと削除（空ノードの再発を防ぐ）
+        const hasContent = dAt.j.length || dAt.s.length || dAt.c.length || dAt.memo ||
+                           dAt.red || dAt.rainbow || dAt.black || dAt.business || dAt.racing || dAt.heart || dAt.pillTaken;
+        db.ref('calendar/' + selDate).set(hasContent ? dAt : null).then(() => toast('更新しました'));
     }
 
     function goToday() {
